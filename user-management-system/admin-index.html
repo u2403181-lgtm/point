@@ -1,0 +1,3401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel with User Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    :root {
+        --primary-color: #3a86ff;
+        --secondary-color: #8338ec;
+        --danger-color: #ff006e;
+        --success-color: #06d6a0;
+        --warning-color: #ff9e00;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --gray-color: #6c757d;
+        --sidebar-width: 250px;
+    }
+    
+    body {
+        background-color: #f5f7fb;
+        color: var(--dark-color);
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 20px 0;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+    
+    .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 0 20px 30px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .logo {
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    
+    .logo i {
+        color: var(--primary-color);
+        font-size: 22px;
+    }
+    
+    .logo-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .nav-menu {
+        list-style: none;
+        padding: 20px 0;
+    }
+    
+    .nav-item {
+        padding: 12px 20px;
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .nav-item:hover, .nav-item.active {
+        background-color: rgba(255,255,255,0.1);
+        border-left: 4px solid white;
+    }
+    
+    .nav-item i {
+        margin-right: 15px;
+        font-size: 18px;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .header h1 {
+        color: var(--secondary-color);
+        font-size: 1.8rem;
+    }
+    
+    .admin-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .btn i {
+        margin-right: 8px;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2a75ff;
+    }
+    
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #7328ec;
+    }
+    
+    .btn-success {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background-color: #05c594;
+    }
+    
+    .btn-warning {
+        background-color: var(--warning-color);
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background-color: #e68e00;
+    }
+    
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background-color: #e60063;
+    }
+    
+    /* Stats Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        font-size: 24px;
+        color: white;
+    }
+    
+    .icon-users {
+        background: linear-gradient(45deg, var(--primary-color), #4895ef);
+    }
+    
+    .icon-points {
+        background: linear-gradient(45deg, var(--success-color), #38b000);
+    }
+    
+    .icon-edit {
+        background: linear-gradient(45deg, var(--warning-color), #ff9e00);
+    }
+    
+    .icon-control {
+        background: linear-gradient(45deg, #7209b7, #b5179e);
+    }
+    
+    .stat-info h3 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        color: var(--dark-color);
+    }
+    
+    .stat-info p {
+        color: var(--gray-color);
+        font-size: 0.9rem;
+    }
+    
+    /* User Table */
+    .user-table-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        overflow-x: auto;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .section-header h2 {
+        color: var(--secondary-color);
+    }
+    
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border-radius: 50px;
+        border: 1px solid #ddd;
+        font-size: 0.9rem;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-color);
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table thead {
+        background-color: #f8f9fa;
+    }
+    
+    table th, table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    
+    table th {
+        color: var(--secondary-color);
+        font-weight: 600;
+    }
+    
+    .user-cell {
+        display: flex;
+        align-items: center;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    .user-info h4 {
+        margin-bottom: 3px;
+    }
+    
+    .user-info p {
+        font-size: 0.8rem;
+        color: var(--gray-color);
+    }
+    
+    .points-cell {
+        font-weight: 600;
+        color: var(--secondary-color);
+    }
+    
+    .status-active {
+        background-color: rgba(76, 201, 240, 0.2);
+        color: var(--success-color);
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+    
+    .status-inactive {
+        background-color: rgba(239, 35, 60, 0.2);
+        color: var(--danger-color);
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    /* User Details Page */
+    .user-detail-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .user-profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 25px;
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    .profile-info h2 {
+        margin-bottom: 5px;
+        color: var(--secondary-color);
+    }
+    
+    .profile-info p {
+        color: var(--gray-color);
+        margin-bottom: 10px;
+    }
+    
+    .user-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .detail-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    
+    .detail-card h3 {
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .detail-card h3 i {
+        margin-right: 10px;
+    }
+    
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: var(--gray-color);
+    }
+    
+    .detail-value {
+        color: var(--dark-color);
+        font-weight: 500;
+    }
+    
+    /* Performance Graph Styles */
+    .performance-graph-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .graph-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .graph-header h2 {
+        color: var(--secondary-color);
+    }
+    
+    .graph-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .graph-select {
+        padding: 8px 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: var(--dark-color);
+        font-size: 0.9rem;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .graph-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .graph-stat-item {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .graph-stat-item h4 {
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .graph-stat-item p {
+        color: var(--dark-color);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .stat-change {
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    
+    .stat-change.positive {
+        color: var(--success-color);
+    }
+    
+    .stat-change.negative {
+        color: var(--danger-color);
+    }
+    
+    /* Points Control Panel */
+    .points-control-panel {
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .control-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--secondary-color);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        transition: border 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        grid-column: span 2;
+    }
+    
+    /* Registration Link Card */
+    .registration-link-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 12px;
+        padding: 25px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .registration-link-card h3 {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .registration-link-card h3 i {
+        margin-right: 10px;
+    }
+    
+    .link-container {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    
+    .link-container input {
+        flex: 1;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.9rem;
+    }
+    
+    .link-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    /* No Users Message */
+    .no-users-message {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .no-users-message i {
+        font-size: 4rem;
+        color: var(--gray-color);
+        margin-bottom: 20px;
+    }
+    
+    .no-users-message h3 {
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+    
+    .no-users-message p {
+        color: var(--gray-color);
+        margin-bottom: 30px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Registration Form Styles */
+    .registration-form-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .form-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+    
+    .form-group.registration-form {
+        margin-bottom: 20px;
+    }
+    
+    .form-group.registration-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .form-group.registration-form label.required::after {
+        content: " *";
+        color: var(--danger-color);
+    }
+    
+    .form-control.registration {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 2px solid #e1e5eb;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .form-control.registration:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+    }
+    
+    .form-control.registration.error {
+        border-color: var(--danger-color);
+    }
+    
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: none;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 40px;
+        grid-column: span 2;
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .gender-options {
+        display: flex;
+        gap: 20px;
+        margin-top: 5px;
+    }
+    
+    .gender-option {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .gender-option input {
+        margin-right: 8px;
+    }
+    
+    /* Registration Success Message */
+    .registration-success-message {
+        text-align: center;
+        padding: 60px 40px;
+        display: none;
+    }
+    
+    .registration-success-message i {
+        font-size: 5rem;
+        color: var(--success-color);
+        margin-bottom: 20px;
+    }
+    
+    .registration-success-message h2 {
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+    }
+    
+    .registration-success-message p {
+        color: var(--gray-color);
+        margin-bottom: 30px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .user-id-display {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px 0;
+        text-align: center;
+        border: 2px dashed #dee2e6;
+    }
+    
+    .user-id-display strong {
+        color: var(--secondary-color);
+        font-size: 1.2rem;
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .modal-header h3 {
+        color: var(--secondary-color);
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray-color);
+    }
+    
+    /* History Page Styles */
+    .history-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .history-header h2 {
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+        font-size: 1.8rem;
+    }
+    
+    .history-header p {
+        color: var(--gray-color);
+        font-size: 0.95rem;
+    }
+    
+    .history-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .history-summary-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+        padding: 20px;
+        color: white;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    
+    .history-summary-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .history-summary-card h4 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+    
+    .history-summary-card p {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .history-tabs {
+        display: flex;
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 25px;
+    }
+    
+    .history-tab {
+        padding: 12px 30px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--gray-color);
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        position: relative;
+        font-size: 0.95rem;
+    }
+    
+    .history-tab:hover {
+        color: var(--primary-color);
+    }
+    
+    .history-tab.active {
+        color: var(--primary-color);
+        border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .history-content {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .history-content.active {
+        display: block;
+    }
+    
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    
+    .history-table th {
+        background-color: #f8f9fa;
+        color: var(--secondary-color);
+        font-weight: 600;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .history-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+    
+    .history-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .history-type {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .history-type.points {
+        background-color: rgba(58, 134, 255, 0.15);
+        color: var(--primary-color);
+        border: 1px solid rgba(58, 134, 255, 0.3);
+    }
+    
+    .history-type.salary {
+        background-color: rgba(6, 214, 160, 0.15);
+        color: var(--success-color);
+        border: 1px solid rgba(6, 214, 160, 0.3);
+    }
+    
+    .history-type.both {
+        background-color: rgba(131, 56, 236, 0.15);
+        color: var(--secondary-color);
+        border: 1px solid rgba(131, 56, 236, 0.3);
+    }
+    
+    .history-amount {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+    
+    .history-amount.positive {
+        color: var(--success-color);
+    }
+    
+    .history-amount.positive::before {
+        content: '+';
+    }
+    
+    .history-amount.negative {
+        color: var(--danger-color);
+    }
+    
+    .history-amount.negative::before {
+        content: '-';
+    }
+    
+    .no-history-message {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gray-color);
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    
+    .no-history-message i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #d0d0d0;
+    }
+    
+    .no-history-message h3 {
+        color: var(--gray-color);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .no-history-message p {
+        max-width: 400px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    /* Page Styles */
+    .page {
+        display: none;
+    }
+    
+    .page.active {
+        display: block;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 992px) {
+        .sidebar {
+            width: 80px;
+        }
+        
+        .sidebar .logo-text,
+        .sidebar .nav-item span {
+            display: none;
+        }
+        
+        .sidebar .nav-item {
+            justify-content: center;
+            padding: 15px;
+        }
+        
+        .sidebar .nav-item i {
+            margin-right: 0;
+            font-size: 20px;
+        }
+        
+        .main-content {
+            margin-left: 80px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .control-form {
+            grid-template-columns: 1fr;
+        }
+        
+        .button-group {
+            grid-column: span 1;
+            flex-wrap: wrap;
+        }
+        
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .search-box {
+            width: 100%;
+        }
+        
+        .admin-actions {
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .link-container {
+            flex-direction: column;
+        }
+        
+        .link-actions {
+            justify-content: center;
+        }
+        
+        .form-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            grid-column: span 1;
+            flex-direction: column;
+        }
+        
+        .gender-options {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chart-container {
+            height: 300px;
+        }
+        
+        .graph-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .history-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .history-tabs {
+            flex-direction: column;
+        }
+        
+        .history-tab {
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-table {
+            font-size: 0.9rem;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 10px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .user-profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+        
+        .user-details-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .graph-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .history-summary {
+            grid-template-columns: 1fr;
+        }
+        
+        .history-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-users-cog"></i>
+            </div>
+            <div class="logo-text">Admin Panel</div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item active" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </li>
+            <li class="nav-item" data-page="users">
+                <i class="fas fa-user-friends"></i>
+                <span>All Users</span>
+            </li>
+            <li class="nav-item" data-page="register-user">
+                <i class="fas fa-user-plus"></i>
+                <span>Register User</span>
+            </li>
+            <li class="nav-item" data-page="registration-link">
+                <i class="fas fa-link"></i>
+                <span>Registration Link</span>
+            </li>
+        </ul>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div class="page active" id="dashboard-page">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-users-cog"></i> Admin Dashboard</h1>
+                <div class="admin-actions">
+                    <button class="btn btn-primary" id="go-to-register-btn">
+                        <i class="fas fa-user-plus"></i> Register New User
+                    </button>
+                    <button class="btn btn-secondary" id="refresh-data">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Registration Link Card -->
+            <div class="registration-link-card">
+                <h3><i class="fas fa-link"></i> User Registration System</h3>
+                <p>Share this link with users to allow them to create accounts. All registered users will appear in your admin dashboard.</p>
+                
+                <div class="link-container">
+                    <input type="text" id="registration-link" value="" readonly>
+                    <button class="btn btn-success" id="copy-registration-link">
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+                </div>
+                
+                <div class="link-actions">
+                    <button class="btn btn-primary" id="go-to-register-from-dashboard">
+                        <i class="fas fa-user-plus"></i> Register User Now
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon icon-users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-users">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon icon-points">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-points">0</h3>
+                        <p>Total Points</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon icon-edit">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="edits-today">0</h3>
+                        <p>Edits Today</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon icon-control">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="new-users-today">0</h3>
+                        <p>New Users Today</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Users Table -->
+            <div class="user-table-container">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-clock"></i> Recently Registered Users</h2>
+                    <a href="#" class="btn btn-primary view-all-users-btn">
+                        <i class="fas fa-list"></i> View All Users
+                    </a>
+                </div>
+                
+                <div id="recent-users-container">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- All Users Page -->
+        <div class="page" id="users-page">
+            <div class="header">
+                <h1><i class="fas fa-user-friends"></i> All Users</h1>
+                <div class="admin-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-all-users" placeholder="Search users...">
+                    </div>
+                    <button class="btn btn-success" id="go-to-register-from-users">
+                        <i class="fas fa-user-plus"></i> New User
+                    </button>
+                </div>
+            </div>
+            
+            <div id="all-users-container">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+        
+        <!-- Register User Page -->
+        <div class="page" id="register-user-page">
+            <div class="header">
+                <h1><i class="fas fa-user-plus"></i> Register New User</h1>
+                <div class="admin-actions">
+                    <button class="btn btn-secondary" id="back-to-dashboard-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </div>
+            
+            <div class="registration-form-container">
+                <form id="registration-form">
+                    <div class="form-container">
+                        <div class="form-group registration-form">
+                            <label for="firstName" class="required">First Name</label>
+                            <input type="text" id="firstName" class="form-control registration" placeholder="Enter first name" required>
+                            <div class="error-message" id="firstName-error">Please enter first name</div>
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="lastName" class="required">Last Name</label>
+                            <input type="text" id="lastName" class="form-control registration" placeholder="Enter last name" required>
+                            <div class="error-message" id="lastName-error">Please enter last name</div>
+                        </div>
+                        
+                        <div class="form-group registration-form full-width">
+                            <label for="email" class="required">Email Address</label>
+                            <input type="email" id="email" class="form-control registration" placeholder="Enter email address" required>
+                            <div class="error-message" id="email-error">Please enter a valid email address</div>
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control registration" placeholder="Enter phone number">
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" class="form-control registration">
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="gender">Gender</label>
+                            <div class="gender-options">
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="Male"> Male
+                                </label>
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="Female"> Female
+                                </label>
+                                <label class="gender-option">
+                                    <input type="radio" name="gender" value="Other"> Other
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="university" class="required">University/College</label>
+                            <input type="text" id="university" class="form-control registration" placeholder="Enter university/college name" required>
+                            <div class="error-message" id="university-error">Please enter university/college name</div>
+                        </div>
+                        
+                        <div class="form-group registration-form full-width">
+                            <label for="address" class="required">Present Address</label>
+                            <textarea id="address" class="form-control registration" placeholder="Enter present address" rows="3" required></textarea>
+                            <div class="error-message" id="address-error">Please enter present address</div>
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="password" class="required">Password</label>
+                            <input type="password" id="password" class="form-control registration" placeholder="Enter password" required minlength="6">
+                            <div class="error-message" id="password-error">Password must be at least 6 characters</div>
+                        </div>
+                        
+                        <div class="form-group registration-form">
+                            <label for="confirmPassword" class="required">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control registration" placeholder="Confirm password" required>
+                            <div class="error-message" id="confirmPassword-error">Passwords must match</div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                            <button type="reset" class="btn btn-outline">
+                                <i class="fas fa-redo"></i> Reset Form
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="registration-success-message" id="registration-success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Account Created Successfully!</h2>
+                    <p>The user account has been created and is now visible in the admin panel.</p>
+                    
+                    <div class="user-id-display">
+                        <p>User ID: <strong id="new-user-id">USR123456</strong></p>
+                        <p>Awarded <strong>100 starting points</strong></p>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="create-another-btn">
+                            <i class="fas fa-user-plus"></i> Create Another Account
+                        </button>
+                        <button class="btn btn-secondary" id="go-to-users-after-registration">
+                            <i class="fas fa-list"></i> View All Users
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Registration Link Page -->
+        <div class="page" id="registration-link-page">
+            <div class="header">
+                <h1><i class="fas fa-link"></i> Registration Link</h1>
+            </div>
+            
+            <div class="registration-link-card">
+                <h3><i class="fas fa-link"></i> User Registration Link</h3>
+                <p>Share this link with users to allow them to create accounts. All registered users will appear in your admin dashboard.</p>
+                
+                <div class="link-container">
+                    <input type="text" id="registration-link-full" value="" readonly>
+                    <button class="btn btn-success" id="copy-registration-link-full">
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+                </div>
+                
+                <div class="link-actions">
+                    <button class="btn btn-primary" id="go-to-register-from-link-page">
+                        <i class="fas fa-user-plus"></i> Register User Now
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Detail Page -->
+        <div class="page" id="user-detail-page">
+            <div class="header">
+                <h1><i class="fas fa-user-circle"></i> User Details</h1>
+                <div class="admin-actions">
+                    <button class="btn btn-secondary" id="back-to-users-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Users
+                    </button>
+                </div>
+            </div>
+            
+            <div class="user-detail-container">
+                <div class="user-profile-header">
+                    <div class="profile-avatar" id="detail-avatar">JD</div>
+                    <div class="profile-info">
+                        <h2 id="detail-name">John Doe</h2>
+                        <p id="detail-email">john.doe@example.com</p>
+                        <p><strong>User ID:</strong> <span id="detail-id">USR001</span></p>
+                        <p><strong>Joined:</strong> <span id="detail-join-date">2023-10-15</span></p>
+                    </div>
+                </div>
+                
+                <div class="user-details-grid">
+                    <div class="detail-card">
+                        <h3><i class="fas fa-info-circle"></i> Personal Information</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Full Name:</span>
+                            <span class="detail-value" id="detail-fullname">John Doe</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value" id="detail-email-value">john.doe@example.com</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value" id="detail-phone">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Gender:</span>
+                            <span class="detail-value" id="detail-gender">Male</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <h3><i class="fas fa-graduation-cap"></i> Education Information</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">University/College:</span>
+                            <span class="detail-value" id="detail-university">Harvard University</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Address:</span>
+                            <span class="detail-value" id="detail-address">123 Main Street, Cambridge, MA</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date of Birth:</span>
+                            <span class="detail-value" id="detail-dob">1990-05-15</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Registration Date:</span>
+                            <span class="detail-value" id="detail-reg-date">2023-10-15</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <h3><i class="fas fa-chart-line"></i> Account Stats</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Current Points:</span>
+                            <span class="detail-value" id="detail-points">1,250</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Current Salary:</span>
+                            <span class="detail-value" id="detail-salary">৳ 0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Account Status:</span>
+                            <span class="detail-value">
+                                <span class="status-active" id="detail-status">Active</span>
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Login:</span>
+                            <span class="detail-value" id="detail-last-login">2023-11-20 14:30</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Graph Section -->
+                <div class="performance-graph-container">
+                    <div class="graph-header">
+                        <h2><i class="fas fa-chart-bar"></i> Performance Analysis</h2>
+                        <div class="graph-controls">
+                            <select id="graph-period" class="graph-select">
+                                <option value="month">This Month vs Last Month</option>
+                                <option value="quarter">Last 3 Months</option>
+                                <option value="year">Year to Date</option>
+                            </select>
+                            <button class="btn btn-primary" id="generate-performance-report">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="performance-chart"></canvas>
+                    </div>
+                    
+                    <div class="graph-stats">
+                        <div class="graph-stat-item">
+                            <h4>Current Month Avg</h4>
+                            <p id="current-month-avg">85%</p>
+                            <div class="stat-change positive" id="current-month-change">+5% from last</div>
+                        </div>
+                        <div class="graph-stat-item">
+                            <h4>Last Month Avg</h4>
+                            <p id="last-month-avg">80%</p>
+                            <div class="stat-change negative" id="last-month-change">-2% from prev</div>
+                        </div>
+                        <div class="graph-stat-item">
+                            <h4>Avg Salary This Month</h4>
+                            <p id="avg-salary-current">৳ 4,200</p>
+                            <div class="stat-change positive" id="salary-change">+৳ 200</div>
+                        </div>
+                        <div class="graph-stat-item">
+                            <h4>Total Points Earned</h4>
+                            <p id="total-points-earned">450</p>
+                            <div class="stat-change positive" id="points-change">+15%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Points & Salary Control Panel -->
+                <div class="points-control-panel">
+                    <div class="section-header">
+                        <h2><i class="fas fa-sliders-h"></i> Points & Salary Management</h2>
+                        <button class="btn btn-secondary" id="view-history-btn">
+                            <i class="fas fa-history"></i> View History
+                        </button>
+                    </div>
+                    
+                    <div class="control-form">
+                        <!-- Points Section -->
+                        <div class="form-group">
+                            <label for="current-user-points"><i class="fas fa-star"></i> Current Points</label>
+                            <input type="text" id="current-user-points" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="new-points-value"><i class="fas fa-edit"></i> Set New Points Value</label>
+                            <input type="number" id="new-points-value" class="form-control" placeholder="Enter new points value" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="points-to-add"><i class="fas fa-plus"></i> Add Points</label>
+                            <input type="number" id="points-to-add" class="form-control" placeholder="Enter points to add" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="points-to-subtract"><i class="fas fa-minus"></i> Subtract Points</label>
+                            <input type="number" id="points-to-subtract" class="form-control" placeholder="Enter points to subtract" min="0">
+                        </div>
+                        
+                        <!-- Salary Section -->
+                        <div class="form-group">
+                            <label for="current-user-salary"><i class="fas fa-dollar-sign"></i> Current Salary (৳)</label>
+                            <input type="text" id="current-user-salary" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="new-salary-value"><i class="fas fa-edit"></i> Set New Salary Value</label>
+                            <input type="number" id="new-salary-value" class="form-control" placeholder="Enter new salary value" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="salary-to-add"><i class="fas fa-plus"></i> Add to Salary</label>
+                            <input type="number" id="salary-to-add" class="form-control" placeholder="Enter amount to add" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="salary-to-subtract"><i class="fas fa-minus"></i> Subtract from Salary</label>
+                            <input type="number" id="salary-to-subtract" class="form-control" placeholder="Enter amount to subtract" min="0">
+                        </div>
+                        
+                        <div class="button-group">
+                            <!-- Points Buttons -->
+                            <button class="btn btn-success" id="update-points-btn">
+                                <i class="fas fa-sync-alt"></i> Update Points
+                            </button>
+                            <button class="btn btn-primary" id="add-points-btn">
+                                <i class="fas fa-plus"></i> Add Points
+                            </button>
+                            <button class="btn btn-warning" id="subtract-points-btn">
+                                <i class="fas fa-minus"></i> Subtract Points
+                            </button>
+                            
+                            <!-- Salary Buttons -->
+                            <button class="btn btn-success" id="update-salary-btn">
+                                <i class="fas fa-sync-alt"></i> Update Salary
+                            </button>
+                            <button class="btn btn-primary" id="add-salary-btn">
+                                <i class="fas fa-plus"></i> Add to Salary
+                            </button>
+                            <button class="btn btn-warning" id="subtract-salary-btn">
+                                <i class="fas fa-minus"></i> Subtract from Salary
+                            </button>
+                            
+                            <!-- Reset Button -->
+                            <button class="btn btn-secondary" id="reset-controls-form-btn">
+                                <i class="fas fa-redo"></i> Reset Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User History Page -->
+        <div class="page" id="user-history-page">
+            <div class="header">
+                <h1><i class="fas fa-history"></i> Earning History</h1>
+                <div class="admin-actions">
+                    <button class="btn btn-secondary" id="back-to-user-detail-btn">
+                        <i class="fas fa-arrow-left"></i> Back to User Details
+                    </button>
+                </div>
+            </div>
+            
+            <div class="history-container">
+                <div class="history-header">
+                    <div>
+                        <h2 id="history-user-name">John Doe</h2>
+                        <p id="history-user-id">ID: USR001</p>
+                    </div>
+                </div>
+                
+                <div class="history-summary">
+                    <div class="history-summary-card">
+                        <h4>Total Points Earned</h4>
+                        <p id="summary-total-points">0</p>
+                    </div>
+                    <div class="history-summary-card">
+                        <h4>Total Salary Earned</h4>
+                        <p id="summary-total-salary">৳ 0</p>
+                    </div>
+                    <div class="history-summary-card">
+                        <h4>Transactions</h4>
+                        <p id="summary-total-transactions">0</p>
+                    </div>
+                    <div class="history-summary-card">
+                        <h4>Last Transaction</h4>
+                        <p id="summary-last-transaction">N/A</p>
+                    </div>
+                </div>
+                
+                <div class="history-tabs">
+                    <button class="history-tab active" data-tab="all">All History</button>
+                    <button class="history-tab" data-tab="points">Points History</button>
+                    <button class="history-tab" data-tab="salary">Salary History</button>
+                </div>
+                
+                <div class="history-content active" id="all-history">
+                    <div id="all-history-content">
+                        <!-- All history content will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="history-content" id="points-history">
+                    <div id="points-history-content">
+                        <!-- Points history content will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="history-content" id="salary-history">
+                    <div id="salary-history-content">
+                        <!-- Salary history content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Success!</h3>
+                <button class="close-modal" id="close-success-modal">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--success-color); margin-bottom: 20px;"></i>
+                <h3 id="success-message">Operation Completed Successfully</h3>
+                <button class="btn btn-primary" id="close-success-btn" style="margin-top: 20px;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/shared-db.js"></script>
+    <script>
+        // Global variables
+        let currentPage = 'dashboard';
+        let selectedUserId = null;
+        let performanceChart = null;
+        let allUsers = [];
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load users from shared DB
+            allUsers = window.sharedDB.getAllUsers();
+            
+            // Setup registration form
+            setupRegistrationForm();
+            
+            // Setup navigation
+            setupNavigation();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Setup history tabs
+            setupHistoryTabs();
+            
+            // Load dashboard
+            loadDashboard();
+            
+            // Set registration link
+            setRegistrationLink();
+        });
+        
+        // Set registration link
+        function setRegistrationLink() {
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+            const registrationLink = baseUrl + 'account-create.html';
+            
+            document.getElementById('registration-link').value = registrationLink;
+            document.getElementById('registration-link-full').value = registrationLink;
+        }
+        
+        // Setup registration form
+        function setupRegistrationForm() {
+            // Set today's date as max for date of birth
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dob').setAttribute('max', today);
+            
+            // Set default date to 18 years ago
+            const defaultDate = new Date();
+            defaultDate.setFullYear(defaultDate.getFullYear() - 18);
+            document.getElementById('dob').value = defaultDate.toISOString().split('T')[0];
+            
+            // Setup form validation
+            setupFormValidation();
+        }
+        
+        // Setup form validation
+        function setupFormValidation() {
+            const requiredFields = document.querySelectorAll('.required');
+            
+            requiredFields.forEach(field => {
+                const input = field.closest('.form-group').querySelector('.form-control.registration, textarea');
+                const errorElement = field.closest('.form-group').querySelector('.error-message');
+                
+                if (input) {
+                    input.addEventListener('blur', function() {
+                        validateField(this, errorElement);
+                    });
+                }
+            });
+            
+            // Email validation
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            
+            emailInput.addEventListener('blur', function() {
+                validateEmail(this, emailError);
+            });
+            
+            // Password confirmation validation
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const confirmPasswordError = document.getElementById('confirmPassword-error');
+            
+            confirmPasswordInput.addEventListener('blur', function() {
+                validatePasswordMatch(passwordInput, this, confirmPasswordError);
+            });
+        }
+        
+        // Validate a field
+        function validateField(input, errorElement) {
+            if (!input.value.trim()) {
+                input.classList.add('error');
+                errorElement.style.display = 'block';
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Validate email
+        function validateEmail(input, errorElement) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!input.value.trim()) {
+                input.classList.add('error');
+                errorElement.textContent = 'Please enter email address';
+                errorElement.style.display = 'block';
+                return false;
+            } else if (!emailRegex.test(input.value)) {
+                input.classList.add('error');
+                errorElement.textContent = 'Please enter a valid email address';
+                errorElement.style.display = 'block';
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Validate password match
+        function validatePasswordMatch(passwordInput, confirmInput, errorElement) {
+            if (passwordInput.value !== confirmInput.value) {
+                confirmInput.classList.add('error');
+                errorElement.textContent = 'Passwords do not match';
+                errorElement.style.display = 'block';
+                return false;
+            } else {
+                confirmInput.classList.remove('error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Setup navigation
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show selected page
+                    showPage(page);
+                });
+            });
+        }
+        
+        // Show specific page
+        function showPage(pageName) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageName + '-page').classList.add('active');
+            currentPage = pageName;
+            
+            // Load page content
+            if (pageName === 'dashboard') {
+                loadDashboard();
+            } else if (pageName === 'users') {
+                loadAllUsers();
+            } else if (pageName === 'register-user') {
+                loadRegistrationPage();
+            } else if (pageName === 'registration-link') {
+                loadRegistrationLinkPage();
+            }
+        }
+        
+        // Load dashboard
+        function loadDashboard() {
+            updateStats();
+            loadRecentUsers();
+        }
+        
+        // Update stats on dashboard
+        function updateStats() {
+            const stats = window.sharedDB.getAdminStats();
+            
+            document.getElementById('total-users').textContent = stats.totalUsers.toLocaleString();
+            document.getElementById('total-points').textContent = stats.totalPoints.toLocaleString();
+            document.getElementById('new-users-today').textContent = stats.newUsersToday;
+            
+            // Get edits today from admin settings
+            const adminSettings = JSON.parse(localStorage.getItem('ADMIN_SETTINGS_CROSS_DEVICE') || '{}');
+            document.getElementById('edits-today').textContent = adminSettings.totalEdits || 0;
+        }
+        
+        // Load recent users table
+        function loadRecentUsers() {
+            const container = document.getElementById('recent-users-container');
+            allUsers = window.sharedDB.getAllUsers();
+            
+            if (allUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="no-users-message">
+                        <i class="fas fa-users-slash"></i>
+                        <h3>No Users Yet</h3>
+                        <p>No users have registered yet. Use the "Register User" page to add users.</p>
+                        <button class="btn btn-primary go-to-register-btn">
+                            <i class="fas fa-user-plus"></i> Register User
+                        </button>
+                    </div>
+                `;
+                
+                // Add event listener to the button
+                document.querySelector('.go-to-register-btn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage('register-user');
+                });
+                
+                return;
+            }
+            
+            // Sort users by join date (newest first)
+            const sortedUsers = [...allUsers].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // Get 5 most recent users
+            const recentUsers = sortedUsers.slice(0, 5);
+            
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>University/College</th>
+                            <th>Points</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            recentUsers.forEach(user => {
+                const userData = window.sharedDB.getUserData(user.id);
+                const initials = (user.firstName ? user.firstName.charAt(0) : '') + (user.lastName ? user.lastName.charAt(0) : 'U');
+                
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">${initials}</div>
+                                <div class="user-info">
+                                    <h4>${user.name || user.firstName + ' ' + user.lastName}</h4>
+                                    <p>ID: ${user.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.university || 'Not specified'}</td>
+                        <td class="points-cell">${userData.points || 0}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary view-user-btn" data-id="${user.id}">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    viewUserDetails(userId);
+                });
+            });
+        }
+        
+        // Load registration page
+        function loadRegistrationPage() {
+            // Reset form
+            document.getElementById('registration-form').reset();
+            document.getElementById('registration-form').style.display = 'block';
+            document.getElementById('registration-success-message').style.display = 'none';
+            
+            // Reset validation states
+            document.querySelectorAll('.form-control.registration, textarea').forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // Reset default date
+            const defaultDate = new Date();
+            defaultDate.setFullYear(defaultDate.getFullYear() - 18);
+            document.getElementById('dob').value = defaultDate.toISOString().split('T')[0];
+        }
+        
+        // Load all users table
+        function loadAllUsers() {
+            const container = document.getElementById('all-users-container');
+            allUsers = window.sharedDB.getAllUsers();
+            
+            if (allUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="no-users-message">
+                        <i class="fas fa-users-slash"></i>
+                        <h3>No Users Yet</h3>
+                        <p>No users have registered yet. Use the "Register User" page to add users.</p>
+                        <button class="btn btn-success go-to-register-btn">
+                            <i class="fas fa-user-plus"></i> Register User
+                        </button>
+                    </div>
+                `;
+                
+                // Add event listener to the button
+                document.querySelector('.go-to-register-btn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage('register-user');
+                });
+                
+                return;
+            }
+            
+            let tableHTML = `
+                <div class="user-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>University/College</th>
+                                <th>Gender</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            allUsers.forEach(user => {
+                const userData = window.sharedDB.getUserData(user.id);
+                const initials = (user.firstName ? user.firstName.charAt(0) : '') + (user.lastName ? user.lastName.charAt(0) : 'U');
+                
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">${initials}</div>
+                                <div class="user-info">
+                                    <h4>${user.name || user.firstName + ' ' + user.lastName}</h4>
+                                    <p>ID: ${user.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.university || 'N/A'}</td>
+                        <td>${user.gender || 'N/A'}</td>
+                        <td class="points-cell">${userData.points || 0}</td>
+                        <td>
+                            <span class="${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${user.status || 'active'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary view-user-btn" data-id="${user.id}">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-danger delete-user-btn" data-id="${user.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tableHTML;
+            
+            // Add event listeners
+            document.querySelectorAll('.view-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    viewUserDetails(userId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    deleteUser(userId);
+                });
+            });
+            
+            // Setup search functionality
+            document.getElementById('search-all-users').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredUsers = allUsers.filter(user => 
+                    (user.firstName && user.firstName.toLowerCase().includes(searchTerm)) || 
+                    (user.lastName && user.lastName.toLowerCase().includes(searchTerm)) ||
+                    (user.name && user.name.toLowerCase().includes(searchTerm)) ||
+                    (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                    (user.university && user.university.toLowerCase().includes(searchTerm)) ||
+                    (user.id && user.id.toLowerCase().includes(searchTerm))
+                );
+                
+                updateAllUsersTable(filteredUsers);
+            });
+        }
+        
+        // Update all users table with filtered users
+        function updateAllUsersTable(filteredUsers) {
+            const container = document.getElementById('all-users-container');
+            
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="no-users-message">
+                        <i class="fas fa-search"></i>
+                        <h3>No Users Found</h3>
+                        <p>No users match your search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = `
+                <div class="user-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>University/College</th>
+                                <th>Gender</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            filteredUsers.forEach(user => {
+                const userData = window.sharedDB.getUserData(user.id);
+                const initials = (user.firstName ? user.firstName.charAt(0) : '') + (user.lastName ? user.lastName.charAt(0) : 'U');
+                
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">${initials}</div>
+                                <div class="user-info">
+                                    <h4>${user.name || user.firstName + ' ' + user.lastName}</h4>
+                                    <p>ID: ${user.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.university || 'N/A'}</td>
+                        <td>${user.gender || 'N/A'}</td>
+                        <td class="points-cell">${userData.points || 0}</td>
+                        <td>
+                            <span class="${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${user.status || 'active'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary view-user-btn" data-id="${user.id}">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="btn btn-danger delete-user-btn" data-id="${user.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tableHTML;
+            
+            // Reattach event listeners
+            document.querySelectorAll('.view-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    viewUserDetails(userId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    deleteUser(userId);
+                });
+            });
+        }
+        
+        // Load registration link page
+        function loadRegistrationLinkPage() {
+            // Already set in initialization
+        }
+        
+        // View user details
+        function viewUserDetails(userId) {
+            const user = window.sharedDB.getUserById(userId);
+            if (!user) {
+                alert('User not found!');
+                return;
+            }
+            
+            selectedUserId = userId;
+            const userData = window.sharedDB.getUserData(userId);
+            
+            // Populate user details
+            const initials = (user.firstName ? user.firstName.charAt(0) : '') + (user.lastName ? user.lastName.charAt(0) : 'U');
+            document.getElementById('detail-avatar').textContent = initials;
+            document.getElementById('detail-name').textContent = user.name || user.firstName + ' ' + user.lastName;
+            document.getElementById('detail-email').textContent = user.email;
+            document.getElementById('detail-id').textContent = user.id;
+            document.getElementById('detail-join-date').textContent = user.joinDate || user.createdAt?.split('T')[0] || 'N/A';
+            
+            document.getElementById('detail-fullname').textContent = user.name || user.firstName + ' ' + user.lastName;
+            document.getElementById('detail-email-value').textContent = user.email;
+            document.getElementById('detail-phone').textContent = user.phone || 'Not specified';
+            document.getElementById('detail-gender').textContent = user.gender || 'Not specified';
+            document.getElementById('detail-dob').textContent = user.dob || 'Not specified';
+            document.getElementById('detail-address').textContent = user.address || 'Not specified';
+            document.getElementById('detail-university').textContent = user.university || 'Not specified';
+            document.getElementById('detail-reg-date').textContent = user.joinDate || user.createdAt?.split('T')[0] || 'Not specified';
+            document.getElementById('detail-points').textContent = userData.points?.toLocaleString() || '0';
+            document.getElementById('detail-salary').textContent = userData.salary ? `৳ ${userData.salary.toLocaleString()}` : '৳ 0';
+            document.getElementById('detail-last-login').textContent = user.lastLogin || 'Never';
+            document.getElementById('detail-status').textContent = user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1) : 'Active';
+            
+            // Set current points and salary in control panel
+            document.getElementById('current-user-points').value = userData.points || 0;
+            document.getElementById('new-points-value').value = userData.points || 0;
+            document.getElementById('current-user-salary').value = userData.salary || 0;
+            document.getElementById('new-salary-value').value = userData.salary || 0;
+            
+            // Load performance data and create chart
+            loadPerformanceChart(user, userData);
+            
+            // Hide all pages and show user detail page
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById('user-detail-page').classList.add('active');
+        }
+        
+        // Load performance chart for a user
+        function loadPerformanceChart(user, userData) {
+            // Destroy existing chart if it exists
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
+            // Get user's actual performance history
+            const performanceHistory = userData.performanceHistory || [];
+            
+            // If no history, create initial history from current data
+            if (performanceHistory.length === 0) {
+                performanceHistory.push({
+                    date: user.joinDate || user.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+                    points: userData.points || 0,
+                    salary: userData.salary || 0,
+                    tasksCompleted: userData.tasksCompleted || 0
+                });
+            }
+            
+            // Sort performance history by date (newest first, limit to 10)
+            const sortedHistory = [...performanceHistory]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10)
+                .reverse(); // Reverse for chronological display
+            
+            // Prepare chart data
+            const labels = sortedHistory.map(record => {
+                const date = new Date(record.date);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            });
+            
+            const pointsData = sortedHistory.map(record => record.points || 0);
+            const salaryData = sortedHistory.map(record => record.salary || 0);
+            
+            // Calculate statistics from actual data
+            const totalPoints = pointsData.reduce((sum, points) => sum + points, 0);
+            const avgPoints = pointsData.length > 0 ? Math.round(totalPoints / pointsData.length) : 0;
+            
+            const totalSalary = salaryData.reduce((sum, salary) => sum + salary, 0);
+            const avgSalary = salaryData.length > 0 ? Math.round(totalSalary / salaryData.length) : 0;
+            
+            // Update performance stats with actual data
+            document.getElementById('current-month-avg').textContent = `${avgPoints}`;
+            document.getElementById('total-points-earned').textContent = totalPoints;
+            document.getElementById('avg-salary-current').textContent = `৳ ${avgSalary.toLocaleString()}`;
+            
+            // Calculate changes if we have enough data
+            if (pointsData.length > 1) {
+                const firstPoints = pointsData[0];
+                const lastPoints = pointsData[pointsData.length - 1];
+                const pointsChange = firstPoints > 0 ? ((lastPoints - firstPoints) / firstPoints * 100).toFixed(1) : 0;
+                
+                const firstSalary = salaryData[0] || 0;
+                const lastSalary = salaryData[salaryData.length - 1] || 0;
+                const salaryChangeAmount = lastSalary - firstSalary;
+                
+                document.getElementById('points-change').textContent = `${pointsChange >= 0 ? '+' : ''}${pointsChange}%`;
+                document.getElementById('points-change').className = pointsChange >= 0 ? 'stat-change positive' : 'stat-change negative';
+                
+                document.getElementById('salary-change').textContent = `${salaryChangeAmount >= 0 ? '+' : '-'}৳ ${Math.abs(salaryChangeAmount).toLocaleString()}`;
+                document.getElementById('salary-change').className = salaryChangeAmount >= 0 ? 'stat-change positive' : 'stat-change negative';
+            } else {
+                document.getElementById('points-change').textContent = 'No history';
+                document.getElementById('points-change').className = 'stat-change';
+                
+                document.getElementById('salary-change').textContent = 'No history';
+                document.getElementById('salary-change').className = 'stat-change';
+            }
+            
+            // Create new chart with actual data
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Points',
+                            data: pointsData,
+                            backgroundColor: 'rgba(58, 134, 255, 0.7)',
+                            borderColor: 'rgba(58, 134, 255, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Salary (৳)',
+                            data: salaryData,
+                            backgroundColor: 'rgba(6, 214, 160, 0.7)',
+                            borderColor: 'rgba(6, 214, 160, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Performance Points'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Salary (৳)'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += context.parsed.y + ' points';
+                                    } else {
+                                        label += '৳ ' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // View user history
+        function viewUserHistory() {
+            if (!selectedUserId) {
+                alert('No user selected!');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) {
+                alert('User not found!');
+                return;
+            }
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const earningHistory = userData.earningHistory || [];
+            
+            // Set user info in history page
+            document.getElementById('history-user-name').textContent = user.name || user.firstName + ' ' + user.lastName;
+            document.getElementById('history-user-id').textContent = `ID: ${user.id}`;
+            
+            // Calculate summary
+            const pointsHistory = earningHistory.filter(h => h.pointsChange);
+            const salaryHistory = earningHistory.filter(h => h.salaryChange);
+            
+            const totalPoints = pointsHistory.reduce((sum, h) => sum + (h.pointsChange || 0), 0);
+            const totalSalary = salaryHistory.reduce((sum, h) => sum + (h.salaryChange || 0), 0);
+            const totalTransactions = earningHistory.length;
+            const lastTransaction = earningHistory.length > 0 ? earningHistory[0].dateTime : 'N/A';
+            
+            // Update summary
+            document.getElementById('summary-total-points').textContent = totalPoints;
+            document.getElementById('summary-total-salary').textContent = `৳ ${totalSalary.toLocaleString()}`;
+            document.getElementById('summary-total-transactions').textContent = totalTransactions;
+            document.getElementById('summary-last-transaction').textContent = lastTransaction;
+            
+            // Load all history
+            loadAllHistory(earningHistory);
+            
+            // Load points history
+            loadPointsHistory(pointsHistory);
+            
+            // Load salary history
+            loadSalaryHistory(salaryHistory);
+            
+            // Hide all pages and show history page
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById('user-history-page').classList.add('active');
+        }
+        
+        // Load all history table
+        function loadAllHistory(history) {
+            const container = document.getElementById('all-history-content');
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="no-history-message">
+                        <i class="fas fa-history"></i>
+                        <h3>No History Available</h3>
+                        <p>No earning history recorded for this user yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Points Change</th>
+                            <th>Salary Change</th>
+                            <th>Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            history.forEach(record => {
+                const type = record.pointsChange && record.salaryChange ? 'both' : 
+                            record.pointsChange ? 'points' : 'salary';
+                const typeClass = type;
+                
+                tableHTML += `
+                    <tr>
+                        <td>${record.dateTime || 'N/A'}</td>
+                        <td><span class="history-type ${typeClass}">${type.toUpperCase()}</span></td>
+                        <td>${record.description || 'N/A'}</td>
+                        <td>
+                            ${record.pointsChange ? `
+                                <span class="history-amount ${record.pointsChange >= 0 ? 'positive' : 'negative'}">
+                                    ${record.pointsChange >= 0 ? '+' : ''}${record.pointsChange} points
+                                </span>
+                            ` : 'N/A'}
+                        </td>
+                        <td>
+                            ${record.salaryChange ? `
+                                <span class="history-amount ${record.salaryChange >= 0 ? 'positive' : 'negative'}">
+                                    ${record.salaryChange >= 0 ? '+' : ''}৳ ${record.salaryChange.toLocaleString()}
+                                </span>
+                            ` : 'N/A'}
+                        </td>
+                        <td>${record.admin || 'System'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+        
+        // Load points history table
+        function loadPointsHistory(pointsHistory) {
+            const container = document.getElementById('points-history-content');
+            
+            if (pointsHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="no-history-message">
+                        <i class="fas fa-star"></i>
+                        <h3>No Points History</h3>
+                        <p>No points history recorded for this user yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Description</th>
+                            <th>Points Change</th>
+                            <th>Previous Points</th>
+                            <th>New Points</th>
+                            <th>Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            pointsHistory.forEach(record => {
+                tableHTML += `
+                    <tr>
+                        <td>${record.dateTime || 'N/A'}</td>
+                        <td>${record.description || 'N/A'}</td>
+                        <td>
+                            <span class="history-amount ${record.pointsChange >= 0 ? 'positive' : 'negative'}">
+                                ${record.pointsChange >= 0 ? '+' : ''}${record.pointsChange} points
+                            </span>
+                        </td>
+                        <td>${record.previousPoints || 'N/A'}</td>
+                        <td>${record.newPoints || 'N/A'}</td>
+                        <td>${record.admin || 'System'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+        
+        // Load salary history table
+        function loadSalaryHistory(salaryHistory) {
+            const container = document.getElementById('salary-history-content');
+            
+            if (salaryHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="no-history-message">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h3>No Salary History</h3>
+                        <p>No salary history recorded for this user yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Description</th>
+                            <th>Salary Change</th>
+                            <th>Previous Salary</th>
+                            <th>New Salary</th>
+                            <th>Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            salaryHistory.forEach(record => {
+                tableHTML += `
+                    <tr>
+                        <td>${record.dateTime || 'N/A'}</td>
+                        <td>${record.description || 'N/A'}</td>
+                        <td>
+                            <span class="history-amount ${record.salaryChange >= 0 ? 'positive' : 'negative'}">
+                                ${record.salaryChange >= 0 ? '+' : ''}৳ ${record.salaryChange.toLocaleString()}
+                            </span>
+                        </td>
+                        <td>${record.previousSalary ? '৳ ' + record.previousSalary.toLocaleString() : 'N/A'}</td>
+                        <td>${record.newSalary ? '৳ ' + record.newSalary.toLocaleString() : 'N/A'}</td>
+                        <td>${record.admin || 'System'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+        
+        // Delete user
+        function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(userId);
+            if (!user) {
+                alert('User not found!');
+                return;
+            }
+            
+            if (window.sharedDB.deleteUser(userId)) {
+                allUsers = window.sharedDB.getAllUsers();
+                
+                // Update UI based on current page
+                if (currentPage === 'dashboard') {
+                    loadDashboard();
+                } else if (currentPage === 'users') {
+                    loadAllUsers();
+                } else if (document.getElementById('user-detail-page').classList.contains('active')) {
+                    showPage('users');
+                }
+                
+                showSuccessMessage(`User ${user.name || user.firstName + ' ' + user.lastName} has been deleted.`);
+            } else {
+                alert('Failed to delete user.');
+            }
+        }
+        
+        // Setup history tabs
+        function setupHistoryTabs() {
+            document.querySelectorAll('.history-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.history-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabType = this.getAttribute('data-tab');
+                    document.getElementById(`${tabType}-history`).classList.add('active');
+                });
+            });
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Registration form submission
+            document.getElementById('registration-form').addEventListener('submit', handleRegistration);
+            
+            // Create another button
+            document.getElementById('create-another-btn').addEventListener('click', function() {
+                document.getElementById('registration-success-message').style.display = 'none';
+                document.getElementById('registration-form').style.display = 'block';
+                document.getElementById('registration-form').reset();
+                
+                // Reset default date
+                const defaultDate = new Date();
+                defaultDate.setFullYear(defaultDate.getFullYear() - 18);
+                document.getElementById('dob').value = defaultDate.toISOString().split('T')[0];
+                
+                // Reset validation states
+                document.querySelectorAll('.form-control.registration, textarea').forEach(input => {
+                    input.classList.remove('error');
+                });
+                
+                document.querySelectorAll('.error-message').forEach(error => {
+                    error.style.display = 'none';
+                });
+            });
+            
+            // Go to users after registration
+            document.getElementById('go-to-users-after-registration').addEventListener('click', function() {
+                showPage('users');
+            });
+            
+            // View all users button on dashboard
+            document.querySelector('.view-all-users-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage('users');
+            });
+            
+            // Navigation buttons
+            document.getElementById('go-to-register-btn').addEventListener('click', function() {
+                showPage('register-user');
+            });
+            
+            document.getElementById('go-to-register-from-dashboard').addEventListener('click', function() {
+                showPage('register-user');
+            });
+            
+            document.getElementById('go-to-register-from-users').addEventListener('click', function() {
+                showPage('register-user');
+            });
+            
+            document.getElementById('go-to-register-from-link-page').addEventListener('click', function() {
+                showPage('register-user');
+            });
+            
+            // Back buttons
+            document.getElementById('back-to-dashboard-btn').addEventListener('click', function() {
+                showPage('dashboard');
+            });
+            
+            document.getElementById('back-to-users-btn').addEventListener('click', function() {
+                showPage('users');
+            });
+            
+            document.getElementById('back-to-user-detail-btn').addEventListener('click', function() {
+                if (selectedUserId) {
+                    viewUserDetails(selectedUserId);
+                }
+            });
+            
+            // View history button
+            document.getElementById('view-history-btn').addEventListener('click', function() {
+                viewUserHistory();
+            });
+            
+            // Refresh data button
+            document.getElementById('refresh-data').addEventListener('click', function() {
+                allUsers = window.sharedDB.getAllUsers();
+                if (currentPage === 'dashboard') {
+                    loadDashboard();
+                } else if (currentPage === 'users') {
+                    loadAllUsers();
+                }
+                showSuccessMessage('Data refreshed successfully.');
+            });
+            
+            // Copy link buttons
+            document.getElementById('copy-registration-link').addEventListener('click', copyRegistrationLink);
+            document.getElementById('copy-registration-link-full').addEventListener('click', copyRegistrationLink);
+            
+            // Generate performance report button
+            document.getElementById('generate-performance-report').addEventListener('click', function() {
+                if (selectedUserId) {
+                    const user = window.sharedDB.getUserById(selectedUserId);
+                    if (user) {
+                        generatePerformanceReport(user);
+                    }
+                }
+            });
+            
+            // Points management buttons
+            document.getElementById('update-points-btn').addEventListener('click', updateUserPoints);
+            document.getElementById('add-points-btn').addEventListener('click', addUserPoints);
+            document.getElementById('subtract-points-btn').addEventListener('click', subtractUserPoints);
+            
+            // Salary management buttons
+            document.getElementById('update-salary-btn').addEventListener('click', updateUserSalary);
+            document.getElementById('add-salary-btn').addEventListener('click', addToUserSalary);
+            document.getElementById('subtract-salary-btn').addEventListener('click', subtractFromUserSalary);
+            
+            // Reset form button
+            document.getElementById('reset-controls-form-btn').addEventListener('click', resetControlsForm);
+            
+            // Graph period change
+            document.getElementById('graph-period').addEventListener('change', function() {
+                // This would filter the performance data by period
+                showSuccessMessage(`Performance period changed to ${this.options[this.selectedIndex].text}`);
+            });
+            
+            // Modal controls
+            document.getElementById('close-success-modal').addEventListener('click', closeSuccessModal);
+            document.getElementById('close-success-btn').addEventListener('click', closeSuccessModal);
+        }
+        
+        // Handle registration form submission
+        function handleRegistration(e) {
+            e.preventDefault();
+            
+            // Validate all required fields
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const email = document.getElementById('email');
+            const university = document.getElementById('university');
+            const address = document.getElementById('address');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            const firstNameValid = validateField(firstName, document.getElementById('firstName-error'));
+            const lastNameValid = validateField(lastName, document.getElementById('lastName-error'));
+            const emailValid = validateEmail(email, document.getElementById('email-error'));
+            const universityValid = validateField(university, document.getElementById('university-error'));
+            const addressValid = validateField(address, document.getElementById('address-error'));
+            const passwordValid = validateField(password, document.getElementById('password-error'));
+            const confirmPasswordValid = validatePasswordMatch(password, confirmPassword, document.getElementById('confirmPassword-error'));
+            
+            if (!firstNameValid || !lastNameValid || !emailValid || !universityValid || !addressValid || !passwordValid || !confirmPasswordValid) {
+                alert('Please fill in all required fields correctly.');
+                return;
+            }
+            
+            // Check if email already exists
+            const existingUser = window.sharedDB.getUserByEmail(email.value.trim());
+            
+            if (existingUser) {
+                alert('This email address is already registered. Please use a different email.');
+                email.classList.add('error');
+                document.getElementById('email-error').textContent = 'This email is already registered';
+                document.getElementById('email-error').style.display = 'block';
+                return;
+            }
+            
+            // Get gender value
+            const genderInputs = document.querySelectorAll('input[name="gender"]:checked');
+            let selectedGender = '';
+            if (genderInputs.length > 0) {
+                selectedGender = genderInputs[0].value;
+            }
+            
+            // Create user object
+            const userId = window.sharedDB.generateUserId();
+            const newUser = {
+                id: userId,
+                firstName: firstName.value.trim(),
+                lastName: lastName.value.trim(),
+                name: firstName.value.trim() + ' ' + lastName.value.trim(),
+                email: email.value.trim(),
+                phone: document.getElementById('phone').value.trim() || '',
+                dob: document.getElementById('dob').value || '',
+                gender: selectedGender || '',
+                university: university.value.trim(),
+                address: address.value.trim(),
+                password: password.value, // In production, hash this!
+                createdAt: new Date().toISOString(),
+                joinDate: new Date().toISOString().split('T')[0],
+                lastLogin: new Date().toLocaleString(),
+                status: "active",
+                accountType: "Student"
+            };
+            
+            // Save user to shared DB
+            if (window.sharedDB.saveUser(newUser)) {
+                // Show success message
+                document.getElementById('new-user-id').textContent = userId;
+                document.getElementById('registration-form').style.display = 'none';
+                document.getElementById('registration-success-message').style.display = 'block';
+                
+                // Update users list and stats
+                allUsers = window.sharedDB.getAllUsers();
+                updateStats();
+                
+                // Add notification for the user
+                window.sharedDB.addNotification(userId, {
+                    title: "Account Created by Admin",
+                    description: "Your account has been created by the administrator.",
+                    type: 'update'
+                });
+                
+                // Add transaction record
+                window.sharedDB.addTransaction(userId, 'points', {
+                    description: 'Account creation by admin',
+                    pointsChange: 100,
+                    previousPoints: 0,
+                    newPoints: 100,
+                    admin: 'Admin'
+                });
+            }
+        }
+        
+        // Generate performance report
+        function generatePerformanceReport(user) {
+            const userData = window.sharedDB.getUserData(user.id);
+            const today = new Date();
+            const reportDate = today.toISOString().split('T')[0];
+            
+            const reportContent = `
+Performance Report for ${user.name || user.firstName + ' ' + user.lastName}
+Generated on: ${reportDate}
+User ID: ${user.id}
+Email: ${user.email}
+
+PERFORMANCE SUMMARY:
+- Current Points: ${userData.points || 0}
+- Current Salary: ৳ ${userData.salary ? userData.salary.toLocaleString() : '0'}
+- Tasks Completed: ${userData.tasksCompleted || 0}/${userData.totalTasks || 0}
+- Account Status: ${user.status || 'active'}
+- Last Login: ${user.lastLogin || 'Never'}
+
+PERFORMANCE ANALYSIS:
+- Average Points: ${document.getElementById('current-month-avg').textContent}
+- Total Points Earned: ${document.getElementById('total-points-earned').textContent}
+- Average Salary: ${document.getElementById('avg-salary-current').textContent}
+- Performance Change: ${document.getElementById('points-change').textContent}
+- Salary Change: ${document.getElementById('salary-change').textContent}
+
+RECOMMENDATIONS:
+1. Continue current performance trends
+2. Focus on areas with lower weekly scores
+3. Maintain consistency for optimal results
+
+Report generated by Admin Panel Performance System.
+            `;
+            
+            // Create a downloadable file
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `performance-report-${user.id}-${reportDate}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccessMessage(`Performance report for ${user.name || user.firstName + ' ' + user.lastName} has been downloaded.`);
+        }
+        
+        // Copy registration link to clipboard
+        function copyRegistrationLink() {
+            const linkInput = document.getElementById('registration-link') || document.getElementById('registration-link-full');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            showSuccessMessage('Registration link copied to clipboard!');
+        }
+        
+        // Update user points
+        function updateUserPoints() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const newPoints = parseInt(document.getElementById('new-points-value').value);
+            if (isNaN(newPoints) || newPoints < 0) {
+                alert('Please enter a valid points value');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const previousPoints = userData.points || 0;
+            const pointsChange = newPoints - previousPoints;
+            
+            // Update user points
+            window.sharedDB.updateUserStats(selectedUserId, { points: newPoints });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'points', {
+                description: 'Admin updated points value',
+                pointsChange: pointsChange,
+                previousPoints: previousPoints,
+                newPoints: newPoints,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Points Updated",
+                description: `Your points have been updated to ${newPoints} by admin.`,
+                type: 'points'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed points
+            document.getElementById('detail-points').textContent = newPoints.toLocaleString();
+            document.getElementById('current-user-points').value = newPoints;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Points updated to ${newPoints} for ${user.name || user.firstName + ' ' + user.lastName}`);
+        }
+        
+        // Add points to user
+        function addUserPoints() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const pointsToAdd = parseInt(document.getElementById('points-to-add').value);
+            if (isNaN(pointsToAdd) || pointsToAdd <= 0) {
+                alert('Please enter a valid number of points to add');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const previousPoints = userData.points || 0;
+            const newPoints = previousPoints + pointsToAdd;
+            
+            // Update user points
+            window.sharedDB.updateUserStats(selectedUserId, { points: newPoints });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'points', {
+                description: 'Admin added points',
+                pointsChange: pointsToAdd,
+                previousPoints: previousPoints,
+                newPoints: newPoints,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Points Added",
+                description: `${pointsToAdd} points have been added to your account by admin.`,
+                type: 'points'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed points
+            document.getElementById('detail-points').textContent = newPoints.toLocaleString();
+            document.getElementById('current-user-points').value = newPoints;
+            document.getElementById('new-points-value').value = newPoints;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Added ${pointsToAdd} points to ${user.name || user.firstName + ' ' + user.lastName}. New total: ${newPoints}`);
+        }
+        
+        // Subtract points from user
+        function subtractUserPoints() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const pointsToSubtract = parseInt(document.getElementById('points-to-subtract').value);
+            if (isNaN(pointsToSubtract) || pointsToSubtract <= 0) {
+                alert('Please enter a valid number of points to subtract');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const previousPoints = userData.points || 0;
+            const newPoints = Math.max(0, previousPoints - pointsToSubtract);
+            const actualSubtracted = previousPoints - newPoints;
+            
+            // Update user points
+            window.sharedDB.updateUserStats(selectedUserId, { points: newPoints });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'points', {
+                description: 'Admin subtracted points',
+                pointsChange: -actualSubtracted,
+                previousPoints: previousPoints,
+                newPoints: newPoints,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Points Subtracted",
+                description: `${actualSubtracted} points have been subtracted from your account by admin.`,
+                type: 'points'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed points
+            document.getElementById('detail-points').textContent = newPoints.toLocaleString();
+            document.getElementById('current-user-points').value = newPoints;
+            document.getElementById('new-points-value').value = newPoints;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Subtracted ${actualSubtracted} points from ${user.name || user.firstName + ' ' + user.lastName}. New total: ${newPoints}`);
+        }
+        
+        // Update user salary
+        function updateUserSalary() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const newSalary = parseFloat(document.getElementById('new-salary-value').value);
+            if (isNaN(newSalary) || newSalary < 0) {
+                alert('Please enter a valid salary value');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const previousSalary = userData.salary || 0;
+            const salaryChange = newSalary - previousSalary;
+            
+            // Update user salary
+            window.sharedDB.updateUserStats(selectedUserId, { salary: newSalary });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'salary', {
+                description: 'Admin updated salary value',
+                salaryChange: salaryChange,
+                previousSalary: previousSalary,
+                newSalary: newSalary,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Salary Updated",
+                description: `Your salary has been updated to ৳${newSalary.toLocaleString()} by admin.`,
+                type: 'salary'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed salary
+            document.getElementById('detail-salary').textContent = `৳ ${newSalary.toLocaleString()}`;
+            document.getElementById('current-user-salary').value = newSalary;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Salary updated to ৳ ${newSalary.toLocaleString()} for ${user.name || user.firstName + ' ' + user.lastName}`);
+        }
+        
+        // Add to user salary
+        function addToUserSalary() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const salaryToAdd = parseFloat(document.getElementById('salary-to-add').value);
+            if (isNaN(salaryToAdd) || salaryToAdd <= 0) {
+                alert('Please enter a valid amount to add to salary');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const currentSalary = userData.salary || 0;
+            const newSalary = currentSalary + salaryToAdd;
+            
+            // Update user salary
+            window.sharedDB.updateUserStats(selectedUserId, { salary: newSalary });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'salary', {
+                description: 'Admin added to salary',
+                salaryChange: salaryToAdd,
+                previousSalary: currentSalary,
+                newSalary: newSalary,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Salary Increased",
+                description: `৳${salaryToAdd.toLocaleString()} has been added to your salary by admin.`,
+                type: 'salary'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed salary
+            document.getElementById('detail-salary').textContent = `৳ ${newSalary.toLocaleString()}`;
+            document.getElementById('current-user-salary').value = newSalary;
+            document.getElementById('new-salary-value').value = newSalary;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Added ৳ ${salaryToAdd.toLocaleString()} to salary of ${user.name || user.firstName + ' ' + user.lastName}. New salary: ৳ ${newSalary.toLocaleString()}`);
+        }
+        
+        // Subtract from user salary
+        function subtractFromUserSalary() {
+            if (!selectedUserId) {
+                alert('No user selected');
+                return;
+            }
+            
+            const salaryToSubtract = parseFloat(document.getElementById('salary-to-subtract').value);
+            if (isNaN(salaryToSubtract) || salaryToSubtract <= 0) {
+                alert('Please enter a valid amount to subtract from salary');
+                return;
+            }
+            
+            const user = window.sharedDB.getUserById(selectedUserId);
+            if (!user) return;
+            
+            const userData = window.sharedDB.getUserData(selectedUserId);
+            const currentSalary = userData.salary || 0;
+            const newSalary = Math.max(0, currentSalary - salaryToSubtract);
+            const actualSubtracted = currentSalary - newSalary;
+            
+            // Update user salary
+            window.sharedDB.updateUserStats(selectedUserId, { salary: newSalary });
+            
+            // Add transaction
+            window.sharedDB.addTransaction(selectedUserId, 'salary', {
+                description: 'Admin subtracted from salary',
+                salaryChange: -actualSubtracted,
+                previousSalary: currentSalary,
+                newSalary: newSalary,
+                admin: 'Admin'
+            });
+            
+            // Add notification
+            window.sharedDB.addNotification(selectedUserId, {
+                title: "Salary Reduced",
+                description: `৳${actualSubtracted.toLocaleString()} has been subtracted from your salary by admin.`,
+                type: 'salary'
+            });
+            
+            // Update edit count
+            window.sharedDB.updateEditsCount();
+            
+            // Update displayed salary
+            document.getElementById('detail-salary').textContent = `৳ ${newSalary.toLocaleString()}`;
+            document.getElementById('current-user-salary').value = newSalary;
+            document.getElementById('new-salary-value').value = newSalary;
+            
+            // Reload performance chart
+            const updatedUserData = window.sharedDB.getUserData(selectedUserId);
+            loadPerformanceChart(user, updatedUserData);
+            
+            showSuccessMessage(`Subtracted ৳ ${actualSubtracted.toLocaleString()} from salary of ${user.name || user.firstName + ' ' + user.lastName}. New salary: ৳ ${newSalary.toLocaleString()}`);
+        }
+        
+        // Reset controls form
+        function resetControlsForm() {
+            if (selectedUserId) {
+                const userData = window.sharedDB.getUserData(selectedUserId);
+                document.getElementById('new-points-value').value = userData.points || 0;
+                document.getElementById('new-salary-value').value = userData.salary || 0;
+            }
+            document.getElementById('points-to-add').value = '';
+            document.getElementById('points-to-subtract').value = '';
+            document.getElementById('salary-to-add').value = '';
+            document.getElementById('salary-to-subtract').value = '';
+        }
+        
+        // Show success message
+        function showSuccessMessage(message) {
+            document.getElementById('success-message').textContent = message;
+            document.getElementById('success-modal').style.display = 'flex';
+        }
+        
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('success-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

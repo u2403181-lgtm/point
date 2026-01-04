@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .signup-card {
+      background: #fff;
+      width: 380px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .signup-card h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #2d3436;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .signup-card label {
+      font-size: 14px;
+      color: #636e72;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .signup-card input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dfe6e9;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    .signup-card input:focus {
+      border-color: #00b894;
+    }
+
+    .error-message {
+      color: #d63031;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .signup-card button {
+      width: 100%;
+      padding: 12px;
+      background: #00b894;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .signup-card button:hover {
+      background: #019874;
+    }
+
+    .footer-text {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #636e72;
+    }
+
+    .footer-text a {
+      color: #00b894;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 4px solid #00b894;
+    }
+
+    .notification.error {
+      border-left: 4px solid #d63031;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+    }
+
+    .notification.success .notification-icon {
+      color: #00b894;
+    }
+
+    .notification.error .notification-icon {
+      color: #d63031;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="signup-card">
+    <h2>Create Account</h2>
+    <form id="signupForm">
+      <div class="input-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        <div id="nameError" class="error-message"></div>
+      </div>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <div id="emailError" class="error-message"></div>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required minlength="6">
+        <div id="passwordError" class="error-message"></div>
+      </div>
+      <div class="input-group">
+        <label for="confirm">Confirm Password</label>
+        <input type="password" id="confirm" name="confirm" placeholder="Confirm your password" required>
+        <div id="confirmError" class="error-message"></div>
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p class="footer-text">Already have an account? <a href="index.html">Login</a></p>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <div class="notification-icon">!</div>
+    <div class="notification-message"></div>
+  </div>
+
+  <script src="scripts/shared-db.js"></script>
+  <script>
+    // DOM Elements
+    const form = document.getElementById('signupForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm');
+    
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmError = document.getElementById('confirmError');
+    const notification = document.getElementById('notification');
+
+    // Show notification
+    function showNotification(message, type = 'error') {
+      const notificationMessage = notification.querySelector('.notification-message');
+      notificationMessage.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 4000);
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      
+      // Reset errors
+      nameError.textContent = "";
+      emailError.textContent = "";
+      passwordError.textContent = "";
+      confirmError.textContent = "";
+      
+      // Remove error classes
+      nameInput.classList.remove('error');
+      emailInput.classList.remove('error');
+      passwordInput.classList.remove('error');
+      confirmInput.classList.remove('error');
+
+      let valid = true;
+
+      // Validate name
+      if (!nameInput.value.trim()) {
+        nameError.textContent = "Full name is required";
+        nameInput.classList.add('error');
+        valid = false;
+      }
+
+      // Validate email
+      if (!emailInput.value.trim()) {
+        emailError.textContent = "Email is required";
+        emailInput.classList.add('error');
+        valid = false;
+      } else if (!isValidEmail(emailInput.value.trim())) {
+        emailError.textContent = "Please enter a valid email address";
+        emailInput.classList.add('error');
+        valid = false;
+      }
+
+      // Validate password
+      if (!passwordInput.value.trim()) {
+        passwordError.textContent = "Password is required";
+        passwordInput.classList.add('error');
+        valid = false;
+      } else if (passwordInput.value.length < 6) {
+        passwordError.textContent = "Password must be at least 6 characters";
+        passwordInput.classList.add('error');
+        valid = false;
+      }
+
+      // Validate confirm password
+      if (!confirmInput.value.trim()) {
+        confirmError.textContent = "Confirm password is required";
+        confirmInput.classList.add('error');
+        valid = false;
+      } else if (passwordInput.value !== confirmInput.value) {
+        confirmError.textContent = "Passwords do not match";
+        confirmInput.classList.add('error');
+        valid = false;
+      }
+
+      if (valid) {
+        // Check if user already exists using shared DB
+        const existingUser = window.sharedDB.getUserByEmail(emailInput.value.trim());
+        
+        if (existingUser) {
+            showNotification("Email already registered. Please login instead.", 'error');
+            return;
+        }
+
+        // Create user object with shared DB structure
+        const userId = window.sharedDB.generateUserId();
+        const user = {
+            id: userId,
+            name: nameInput.value.trim(),
+            firstName: nameInput.value.trim().split(' ')[0],
+            lastName: nameInput.value.trim().split(' ').slice(1).join(' ') || nameInput.value.trim().split(' ')[0],
+            email: emailInput.value.trim(),
+            password: passwordInput.value, // In production, hash this!
+            createdAt: new Date().toISOString(),
+            joinDate: new Date().toISOString().split('T')[0],
+            isFirstLogin: true,
+            hasSubmittedInfo: false,
+            status: 'active',
+            lastLogin: new Date().toLocaleString(),
+            accountType: 'Student'
+        };
+
+        // Save user to shared DB
+        if (window.sharedDB.saveUser(user)) {
+            // Set current user session
+            const sessionUser = {
+                id: userId,
+                name: user.name,
+                email: user.email,
+                isLoggedIn: true,
+                lastLogin: new Date().toLocaleString()
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+            
+            showNotification("Account created successfully! Redirecting...", 'success');
+            
+            // Add welcome notification
+            window.sharedDB.addNotification(userId, {
+                title: "Welcome to Your Account!",
+                description: "Your account has been created successfully. Complete your profile to get started.",
+                type: 'update'
+            });
+            
+            // Redirect to index.html after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
+        } else {
+            showNotification("Failed to create account. Please try again.", 'error');
+        }
+      }
+    });
+
+    // Initialize form
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is already logged in
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (user.isLoggedIn) {
+          window.location.href = "index.html";
+        }
+      }
+    });
+  </script>
+</body>
+</html>

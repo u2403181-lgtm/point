@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Signup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card-container {
+      position: relative;
+      width: 380px;
+      min-height: 500px;
+    }
+
+    .login-card,
+    .signup-card,
+    .info-form {
+      background: #fff;
+      width: 100%;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .active {
+      opacity: 1;
+      transform: translateY(0);
+      position: relative;
+    }
+
+    .hiding {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #2d3436;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    label {
+      font-size: 14px;
+      color: #636e72;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dfe6e9;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #00b894;
+    }
+
+    input.error {
+      border-color: #d63031;
+    }
+
+    .error-message {
+      color: #d63031;
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+
+    .success-message {
+      color: #00b894;
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00b894;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #019874;
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
+    .forgot-password a {
+      font-size: 13px;
+      color: #00b894;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer-text {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #636e72;
+    }
+
+    .footer-text a {
+      color: #00b894;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .footer-text a.create-account {
+      color: #d63031;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 184, 148, 0.3);
+      border-radius: 50%;
+      border-top-color: #00b894;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 4px solid #00b894;
+    }
+
+    .notification.error {
+      border-left: 4px solid #d63031;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+    }
+
+    .notification.success .notification-icon {
+      color: #00b894;
+    }
+
+    .notification.error .notification-icon {
+      color: #d63031;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #dfe6e9;
+    }
+
+    .divider span {
+      padding: 0 10px;
+      color: #636e72;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Card Container -->
+  <div class="card-container">
+    <!-- Login Form -->
+    <div class="login-card active" id="loginForm">
+      <h2>Login</h2>
+      <form id="loginFormElement">
+        <div class="input-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="Enter your email">
+          <div id="loginEmailError" class="error-message"></div>
+        </div>
+        <div class="input-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password">
+          <div id="loginPasswordError" class="error-message"></div>
+        </div>
+        <div class="forgot-password">
+          <a href="#" onclick="resetPassword()">Forgot Password?</a>
+        </div>
+        <button type="submit" id="loginButton">
+          <span id="loginButtonText">Sign In</span>
+          <div id="loginLoader" class="loader" style="display: none;"></div>
+        </button>
+      </form>
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <p class="footer-text">New User? <a href="account-create.html" id="showSignupLink" class="create-account"
+          onclick="window.location.href='account-create.html'">Create Account Here.</a></p>
+    </div>
+
+    <!-- Information Form (shown only for first-time login) -->
+    <div class="info-form hiding" id="infoForm">
+      <h2>Welcome to Your Account!</h2>
+      <p>Since this is your first login, please provide some additional information to complete your profile.</p>
+      <form id="userInfoForm">
+        <div class="input-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter your full name">
+          <div id="nameError" class="error-message"></div>
+        </div>
+        <div class="input-group">
+          <label for="userInfo">Additional Information</label>
+          <textarea id="userInfo"
+            placeholder="Tell us about yourself, your interests, or any other information you'd like to share..."></textarea>
+        </div>
+        <button type="submit" id="submitInfoButton">
+          <span id="submitInfoButtonText">Submit Information</span>
+          <div id="infoLoader" class="loader" style="display: none;"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <div class="notification-icon">!</div>
+    <div class="notification-message"></div>
+  </div>
+
+  <script src="scripts/shared-db.js"></script>
+  <script>
+    // DOM Elements
+    const loginFormElement = document.getElementById('loginFormElement');
+    const userInfoForm = document.getElementById('userInfoForm');
+    const loginForm = document.getElementById('loginForm');
+    const infoForm = document.getElementById('infoForm');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+    const loginButton = document.getElementById('loginButton');
+    const loginButtonText = document.getElementById('loginButtonText');
+    const loginLoader = document.getElementById('loginLoader');
+    const infoLoader = document.getElementById('infoLoader');
+    const submitInfoButtonText = document.getElementById('submitInfoButtonText');
+    const submitInfoButton = document.getElementById('submitInfoButton');
+    const notification = document.getElementById('notification');
+
+    // Show notification
+    function showNotification(message, type = 'error') {
+      const notificationMessage = notification.querySelector('.notification-message');
+      notificationMessage.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 4000);
+    }
+
+    // Show loading state
+    function showLoading(button, buttonText, loader) {
+      button.disabled = true;
+      buttonText.style.display = 'none';
+      loader.style.display = 'inline-block';
+    }
+
+    // Hide loading state
+    function hideLoading(button, buttonText, loader) {
+      button.disabled = false;
+      buttonText.style.display = 'inline';
+      loader.style.display = 'none';
+    }
+
+    // Switch between forms
+    function switchForms(hideForm, showForm) {
+      hideForm.classList.remove('active');
+      hideForm.classList.add('hiding');
+
+      setTimeout(() => {
+        showForm.classList.remove('hiding');
+        showForm.classList.add('active');
+      }, 300);
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Password reset function
+    function resetPassword() {
+      const email = prompt("Enter your email address to reset password:");
+      if (email && isValidEmail(email)) {
+        const user = window.sharedDB.getUserByEmail(email);
+        if (user) {
+          showNotification("Password reset link sent to your email (simulated).", 'success');
+        } else {
+          showNotification("Email not found in our records.", 'error');
+        }
+      } else if (email) {
+        showNotification("Please enter a valid email address.", 'error');
+      }
+    }
+
+    // Handle login form submission
+    loginFormElement.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      // Reset errors
+      loginEmailError.textContent = "";
+      loginPasswordError.textContent = "";
+      loginEmail.classList.remove('error');
+      loginPassword.classList.remove('error');
+
+      let valid = true;
+
+      // Validate email
+      if (!loginEmail.value.trim()) {
+        loginEmailError.textContent = "Email is required";
+        loginEmail.classList.add('error');
+        valid = false;
+      } else if (!isValidEmail(loginEmail.value.trim())) {
+        loginEmailError.textContent = "Please enter a valid email address";
+        loginEmail.classList.add('error');
+        valid = false;
+      }
+
+      // Validate password
+      if (!loginPassword.value.trim()) {
+        loginPasswordError.textContent = "Password is required";
+        loginPassword.classList.add('error');
+        valid = false;
+      }
+
+      if (valid) {
+        showLoading(loginButton, loginButtonText, loginLoader);
+
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Check if user exists in shared DB
+        const user = window.sharedDB.getUserByEmail(loginEmail.value.trim());
+
+        if (!user) {
+          // User does not exist
+          loginEmailError.textContent = "This email account is not registered!";
+          loginEmail.classList.add('error');
+          showNotification("Account not found. Please create an account.", 'error');
+          hideLoading(loginButton, loginButtonText, loginLoader);
+          return;
+        }
+
+        // Check password
+        if (user.password !== loginPassword.value) {
+          loginPasswordError.textContent = "Your password is incorrect!";
+          loginPassword.classList.add('error');
+          showNotification("Incorrect password. Please try again.", 'error');
+          hideLoading(loginButton, loginButtonText, loginLoader);
+          return;
+        }
+
+        // Login successful
+        showNotification("Login successful! Welcome back.", 'success');
+
+        // Update user's last login
+        user.lastLogin = new Date().toLocaleString();
+        window.sharedDB.saveUser(user);
+
+        // Set current user session
+        const sessionUser = {
+          id: user.id,
+          name: user.name || user.firstName + ' ' + user.lastName,
+          email: user.email,
+          isLoggedIn: true
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+
+        // Add login notification
+        window.sharedDB.addNotification(user.id, {
+          title: "Successful Login",
+          description: "You have successfully logged into your account.",
+          type: 'update'
+        });
+
+        // Check if user needs to submit info
+        if (user.isFirstLogin && !user.hasSubmittedInfo) {
+          // Pre-fill the name if available
+          if (user.name) {
+            document.getElementById('fullName').value = user.name;
+          }
+
+          setTimeout(() => {
+            switchForms(loginForm, infoForm);
+          }, 1000);
+        } else {
+          // User has already submitted info, go to user panel
+          setTimeout(() => {
+            window.location.href = "user-panel.html";
+          }, 1500);
+        }
+
+        hideLoading(loginButton, loginButtonText, loginLoader);
+      }
+    });
+
+    // Handle user info form submission
+    userInfoForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('fullName');
+      const nameError = document.getElementById('nameError');
+
+      // Reset errors
+      nameError.textContent = "";
+      fullName.classList.remove('error');
+
+      let valid = true;
+
+      // Validate full name
+      if (!fullName.value.trim()) {
+        nameError.textContent = "Full name is required";
+        fullName.classList.add('error');
+        valid = false;
+      }
+
+      if (valid) {
+        showLoading(submitInfoButton, submitInfoButtonText, infoLoader);
+
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Get current user from session
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        if (currentUser) {
+          // Update user in shared DB
+          const user = window.sharedDB.getUserById(currentUser.id);
+          if (user) {
+            user.name = fullName.value.trim();
+            user.hasSubmittedInfo = true;
+            user.isFirstLogin = false;
+            
+            window.sharedDB.saveUser(user);
+            
+            // Update user data with additional info
+            const userData = window.sharedDB.getUserData(currentUser.id);
+            userData.userInfo = document.getElementById('userInfo').value.trim();
+            window.sharedDB.saveUserData(currentUser.id, userData);
+            
+            // Add notification
+            window.sharedDB.addNotification(currentUser.id, {
+              title: "Profile Updated",
+              description: "Your profile information has been submitted successfully.",
+              type: 'update'
+            });
+            
+            // Update current user session
+            currentUser.name = fullName.value.trim();
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
+
+          showNotification("Information submitted successfully!", 'success');
+
+          // Redirect to user panel
+          setTimeout(() => {
+            window.location.href = "user-panel.html";
+          }, 1500);
+        } else {
+          showNotification("User not found. Please login again.", 'error');
+        }
+
+        hideLoading(submitInfoButton, submitInfoButtonText, infoLoader);
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      // Check if user is already logged in
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (user.isLoggedIn) {
+          window.location.href = "user-panel.html";
+        }
+      }
+    });
+  </script>
+</body>
+</html>

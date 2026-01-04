@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Admin Controlled</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px;
+        }
+
+        /* Main Container with Fixed Size */
+        .dashboard-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            min-height: 600px;
+            background: #f8f9fa;
+            border-radius: 0px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Top Header */
+        .dashboard-header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* User Profile Row */
+        .user-profile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .profile-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .profile-pic-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-pic {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+
+        .profile-upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #667eea;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+
+        .logout-btn:hover {
+            background: #e4455c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+        }
+
+        .logout-btn i {
+            font-size: 14px;
+        }
+
+        /* Badge Container for ID and Time */
+        .badge-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        /* Common Badge Style */
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .meta-badge i {
+            font-size: 10px;
+        }
+
+        /* ID Badge */
+        .badge-id {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border: 1px solid #e1bee7;
+        }
+
+        .badge-id i {
+            color: #7b1fa2;
+        }
+
+        /* Time Badge */
+        .badge-time {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .badge-time i {
+            color: #1976d2;
+        }
+
+        /* Points and Notification Container */
+        .top-right-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Coin/Points Box */
+        .coin-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 25px;
+            background: #fff3d6;
+            border: 1.5px solid #ffd27d;
+            font-weight: 600;
+            color: #a66a00;
+            white-space: nowrap;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .coin-icon {
+            font-size: 16px;
+        }
+
+        .coin-value {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Notification Bell */
+        .bell-box {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+            color: #667eea;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f0f2ff;
+            transition: all 0.3s;
+        }
+
+        .bell-box:hover {
+            background: #e3e7ff;
+            transform: scale(1.05);
+        }
+
+        /* Notification dot */
+        .notify-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #f5576c;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-top: 10px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        /* Scrollable Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Admin Fields Grid */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 380px) {
+            .fields-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .admin-field {
+            background: white;
+            padding: 18px 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .admin-field:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        .field-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 18px;
+            color: white;
+        }
+
+        .field-icon.earnings {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .field-icon.salary {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .field-icon.tasks {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .field-icon.weekly {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .field-title {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .field-value.zero {
+            color: #999;
+        }
+
+        .field-status {
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 16px;
+        }
+
+        .field-status.updated {
+            color: #4caf50;
+        }
+
+        .field-status.empty {
+            color: #999;
+        }
+
+        /* Monthly History */
+        .monthly-history {
+            background: white;
+            border-radius: 15px;
+            padding: 18px;
+            margin-top: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title h3 {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .view-all {
+            color: #667eea;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: #f8f9fa;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+            border-bottom: 2px solid #eee;
+        }
+
+        .history-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .history-table .month-cell {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 12px;
+        }
+
+        .history-table .status-cell {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Notification Panel */
+        .notification-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .notification-panel.show {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            transition: background 0.3s;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.update {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .notification-icon.points {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .notification-icon.salary {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .notification-desc {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .notification-time {
+            color: #999;
+        }
+
+        .admin-time {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .notification-item.unread {
+            background: #f0f7ff;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Search Results */
+        .search-results {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            position: absolute;
+            width: calc(100% - 40px);
+            z-index: 999;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #333;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* Image Upload Modal */
+        .image-upload-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 1002;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-upload-modal.show {
+            display: block;
+        }
+
+        .upload-modal-content h3 {
+            color: #333;
+            margin-bottom: 18px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .upload-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+
+        .upload-btn i {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .upload-btn span {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-container {
+            text-align: center;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 180px;
+            max-height: 180px;
+            border-radius: 10px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .modal-btn.save {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn.save:hover {
+            background: #5a6fd8;
+        }
+
+        .modal-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #e0e0e0;
+        }
+
+        /* Logout Confirmation Modal */
+        .logout-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 350px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 1003;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .logout-modal.show {
+            display: block;
+        }
+
+        .logout-modal h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .logout-modal p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .logout-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .logout-modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        .logout-modal-btn.confirm {
+            background: #f5576c;
+            color: white;
+        }
+
+        .logout-modal-btn.confirm:hover {
+            background: #e4455c;
+        }
+
+        .logout-modal-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .logout-modal-btn.cancel:hover {
+            background: #e0e0e0;
+        }
+
+        /* Scrollbar Styling */
+        .content-area::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 400px) {
+            .dashboard-header {
+                padding: 12px 15px;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+            
+            .fields-grid {
+                gap: 10px;
+            }
+            
+            .admin-field {
+                padding: 15px 12px;
+            }
+            
+            .field-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .field-value {
+                font-size: 20px;
+            }
+            
+            .history-table th,
+            .history-table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+            
+            .coin-box {
+                padding: 6px 10px;
+                min-width: 70px;
+            }
+            
+            .coin-icon {
+                font-size: 14px;
+            }
+            
+            .coin-value {
+                font-size: 13px;
+            }
+            
+            .bell-box {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            .user-name {
+                font-size: 15px;
+            }
+            
+            .profile-pic {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .badge-container {
+                gap: 6px;
+            }
+            
+            .meta-badge {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            
+            .logout-btn {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .dashboard-container {
+                height: 95vh;
+                min-height: 500px;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+            
+            .fields-grid {
+                margin: 12px 0;
+                gap: 10px;
+            }
+            
+            .admin-field {
+                padding: 15px;
+            }
+            
+            .field-icon {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 10px;
+            }
+            
+            .field-value {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Logout Button -->
+        <button class="logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+        
+        <!-- Header -->
+        <div class="dashboard-header">
+            <!-- User Profile Row -->
+            <div class="user-profile-row">
+                <div class="profile-left">
+                    <div class="profile-pic-container" onclick="openImageUpload()">
+                        <img src="" alt="User" class="profile-pic" id="profileImage">
+                        <div class="profile-upload-btn">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="badge-container">
+                            <div class="meta-badge badge-id">
+                                <i class="fas fa-id-card"></i>
+                                <span id="userIdBadge">ID: Loading...</span>
+                            </div>
+                            <div class="meta-badge badge-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="timeBadge">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Points and Notification Container -->
+                <div class="top-right-container">
+                    <!-- Coin/Points Box -->
+                    <div class="coin-box">
+                        <span class="coin-icon">🪙</span>
+                        <span class="coin-value" id="totalPointsValue">0</span>
+                    </div>
+
+                    <!-- Notification Bell -->
+                    <div class="bell-box" id="notificationTrigger">
+                        <i class="fas fa-bell"></i>
+                        <span class="notify-dot" id="notificationDot"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search points, earnings, salary, tasks...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <!-- Search Results -->
+                <div class="search-results" id="searchResults">
+                    <div id="resultsContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Admin Fields Grid -->
+            <div class="fields-grid">
+                <!-- Monthly Earnings -->
+                <div class="admin-field" onclick="showPerformanceGraph('monthlyEarnings')">
+                    <div class="field-icon earnings">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="field-title">Monthly Earnings</div>
+                    <div class="field-value zero" id="fieldMonthlyEarnings">৳0</div>
+                    <div class="field-status empty" id="monthlyEarningsStatus">Waiting for admin</div>
+                </div>
+
+                <!-- Current Salary -->
+                <div class="admin-field" onclick="showPerformanceGraph('salary')">
+                    <div class="field-icon salary">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="field-title">Current Salary</div>
+                    <div class="field-value zero" id="fieldSalary">৳0</div>
+                    <div class="field-status empty" id="salaryStatus">Waiting for admin</div>
+                </div>
+
+                <!-- Tasks Completed -->
+                <div class="admin-field" onclick="showPerformanceGraph('tasks')">
+                    <div class="field-icon tasks">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="field-title">Tasks Completed</div>
+                    <div class="field-value zero" id="fieldTasks">0/0</div>
+                    <div class="field-status empty" id="tasksStatus">Waiting for admin</div>
+                </div>
+
+                <!-- Weekly Earnings -->
+                <div class="admin-field" onclick="showPerformanceGraph('weeklyEarnings')">
+                    <div class="field-icon weekly">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="field-title">Weekly Earnings</div>
+                    <div class="field-value zero" id="fieldWeeklyEarnings">৳0</div>
+                    <div class="field-status empty" id="weeklyEarningsStatus">Waiting for admin</div>
+                </div>
+            </div>
+
+            <!-- Monthly History -->
+            <div class="monthly-history">
+                <div class="section-title">
+                    <h3>Earning History</h3>
+                    <a href="#" class="view-all" onclick="return false;">View All</a>
+                </div>
+                
+                <div class="history-content">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Earnings</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                                    Loading history...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-user-clock"></i>
+                <p>Waiting for admin to update your data...</p>
+                <p style="font-size: 11px; margin-top: 10px;">All fields are controlled by admin panel</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="section-title">
+            <h3>Admin Notifications</h3>
+            <a href="#" class="view-all" id="markAllRead" onclick="markAllAsRead(); return false;">Mark all as read</a>
+        </div>
+        
+        <div id="notificationList">
+            <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <p>No notifications yet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Upload Modal -->
+    <div class="image-upload-modal" id="imageUploadModal">
+        <div class="upload-modal-content">
+            <h3>Update Profile Picture</h3>
+            
+            <div class="preview-container" id="previewContainer">
+                <img id="imagePreview" alt="Preview">
+            </div>
+            
+            <div class="upload-options">
+                <label class="upload-btn" for="fileInput">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload from Computer</span>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                </label>
+                
+                <div class="upload-btn" onclick="useDefaultImage()">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Use Default Avatar</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeImageUpload()">Cancel</button>
+                <button class="modal-btn save" onclick="saveProfileImage()">Save Picture</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="logout-modal" id="logoutModal">
+        <h3><i class="fas fa-sign-out-alt"></i> Confirm Logout</h3>
+        <p>Are you sure you want to logout?<br>You will need to login again to access your dashboard.</p>
+        <div class="logout-modal-actions">
+            <button class="logout-modal-btn cancel" id="cancelLogoutBtn">Cancel</button>
+            <button class="logout-modal-btn confirm" id="confirmLogoutBtn">Yes, Logout</button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <script src="scripts/shared-db.js"></script>
+    <script>
+        // User data and state
+        let currentUser = null;
+        let userData = null;
+        let notifications = [];
+        let searchableData = [];
+        let profileImageFile = null;
+
+        // DOM Elements
+        const contentArea = document.getElementById('contentArea');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const notificationTrigger = document.getElementById('notificationTrigger');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const overlay = document.getElementById('overlay');
+        const notificationDot = document.getElementById('notificationDot');
+        const notificationList = document.getElementById('notificationList');
+        const timeBadge = document.getElementById('timeBadge');
+        const userIdBadge = document.getElementById('userIdBadge');
+        const userName = document.getElementById('userName');
+        const emptyState = document.getElementById('emptyState');
+        const profileImage = document.getElementById('profileImage');
+        const imageUploadModal = document.getElementById('imageUploadModal');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const totalPointsValue = document.getElementById('totalPointsValue');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const logoutModal = document.getElementById('logoutModal');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+
+        // Field elements
+        const fieldElements = {
+            monthlyEarnings: document.getElementById('fieldMonthlyEarnings'),
+            salary: document.getElementById('fieldSalary'),
+            tasks: document.getElementById('fieldTasks'),
+            weeklyEarnings: document.getElementById('fieldWeeklyEarnings')
+        };
+
+        const statusElements = {
+            monthlyEarnings: document.getElementById('monthlyEarningsStatus'),
+            salary: document.getElementById('salaryStatus'),
+            tasks: document.getElementById('tasksStatus'),
+            weeklyEarnings: document.getElementById('weeklyEarningsStatus')
+        };
+
+        // Initialize page
+        function initPage() {
+            // Check if user is logged in
+            const currentUserStr = localStorage.getItem('currentUser');
+            if (!currentUserStr) {
+                redirectToLogin();
+                return;
+            }
+            
+            currentUser = JSON.parse(currentUserStr);
+            if (!currentUser.isLoggedIn) {
+                redirectToLogin();
+                return;
+            }
+            
+            // Load user data from shared DB
+            const user = window.sharedDB.getUserById(currentUser.id);
+            if (!user) {
+                redirectToLogin();
+                return;
+            }
+            
+            userData = window.sharedDB.getUserData(currentUser.id);
+            notifications = userData.notifications || [];
+            
+            // Update UI
+            updateUserProfile(user);
+            updateAllFields();
+            updateNotifications();
+            updateTimeBadge();
+            buildSearchableData();
+            
+            // Start time update interval
+            setInterval(updateTimeBadge, 1000);
+            
+            // Add welcome notification if first time
+            if (notifications.length === 0) {
+                window.sharedDB.addNotification(currentUser.id, {
+                    title: "Welcome to Your Dashboard",
+                    description: "All data fields are controlled by admin panel. Click on boxes to view performance.",
+                    type: 'update'
+                });
+                notifications = window.sharedDB.getUserNotifications(currentUser.id);
+                updateNotifications();
+            }
+        }
+
+        // Redirect to login page
+        function redirectToLogin() {
+            window.location.href = "index.html";
+        }
+
+        // Logout function
+        function logout() {
+            // Clear user session
+            localStorage.removeItem('currentUser');
+            
+            // Add logout notification
+            window.sharedDB.addNotification(currentUser.id, {
+                title: "Session Ended",
+                description: "You have successfully logged out of your account.",
+                type: 'update'
+            });
+            
+            // Show logout message
+            showLogoutMessage();
+            
+            // Redirect to login page after delay
+            setTimeout(() => {
+                redirectToLogin();
+            }, 2000);
+        }
+
+        // Show logout success message
+        function showLogoutMessage() {
+            // Create logout success message
+            const logoutMessage = document.createElement('div');
+            logoutMessage.className = 'notification success';
+            logoutMessage.style.position = 'fixed';
+            logoutMessage.style.top = '20px';
+            logoutMessage.style.left = '50%';
+            logoutMessage.style.transform = 'translateX(-50%)';
+            logoutMessage.style.zIndex = '1004';
+            logoutMessage.innerHTML = `
+                <div class="notification-icon">✓</div>
+                <div class="notification-message">Logout successful! Redirecting to login page...</div>
+            `;
+            
+            document.body.appendChild(logoutMessage);
+            
+            // Show the message
+            setTimeout(() => {
+                logoutMessage.classList.add('show');
+            }, 10);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                logoutMessage.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(logoutMessage);
+                }, 300);
+            }, 2000);
+        }
+
+        // Show logout confirmation modal
+        function showLogoutConfirmation() {
+            logoutModal.classList.add('show');
+            overlay.classList.add('show');
+        }
+
+        // Hide logout confirmation modal
+        function hideLogoutConfirmation() {
+            logoutModal.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+
+        // Update user profile
+        function updateUserProfile(user) {
+            userName.textContent = user.name || user.firstName + ' ' + user.lastName;
+            userIdBadge.textContent = `ID: ${user.id}`;
+            
+            // Set profile image
+            if (userData.profileImage) {
+                profileImage.src = userData.profileImage;
+            } else {
+                profileImage.src = 'https://via.placeholder.com/90/667eea/ffffff?text=' + 
+                    (user.name ? user.name.charAt(0).toUpperCase() : 'U');
+            }
+        }
+
+        // Update all field displays
+        function updateAllFields() {
+            // Update total points
+            totalPointsValue.textContent = userData.points || 0;
+
+            // Monthly Earnings
+            const monthlyEarnings = userData.monthlyEarnings || 0;
+            fieldElements.monthlyEarnings.textContent = `৳${monthlyEarnings.toLocaleString()}`;
+            fieldElements.monthlyEarnings.className = monthlyEarnings > 0 ? 'field-value' : 'field-value zero';
+            statusElements.monthlyEarnings.textContent = monthlyEarnings > 0 ? 'Updated by admin' : 'Waiting for admin';
+            statusElements.monthlyEarnings.className = monthlyEarnings > 0 ? 'field-status updated' : 'field-status empty';
+
+            // Salary
+            const salary = userData.salary || 0;
+            fieldElements.salary.textContent = `৳${salary.toLocaleString()}`;
+            fieldElements.salary.className = salary > 0 ? 'field-value' : 'field-value zero';
+            statusElements.salary.textContent = salary > 0 ? 'Updated by admin' : 'Waiting for admin';
+            statusElements.salary.className = salary > 0 ? 'field-status updated' : 'field-status empty';
+
+            // Tasks
+            const tasksCompleted = userData.tasksCompleted || 0;
+            const totalTasks = userData.totalTasks || 0;
+            fieldElements.tasks.textContent = `${tasksCompleted}/${totalTasks}`;
+            fieldElements.tasks.className = totalTasks > 0 ? 'field-value' : 'field-value zero';
+            statusElements.tasks.textContent = totalTasks > 0 ? 'Updated by admin' : 'Waiting for admin';
+            statusElements.tasks.className = totalTasks > 0 ? 'field-status updated' : 'field-status empty';
+
+            // Weekly Earnings
+            const weeklyEarnings = userData.weeklyEarnings || 0;
+            fieldElements.weeklyEarnings.textContent = `৳${weeklyEarnings.toLocaleString()}`;
+            fieldElements.weeklyEarnings.className = weeklyEarnings > 0 ? 'field-value' : 'field-value zero';
+            statusElements.weeklyEarnings.textContent = weeklyEarnings > 0 ? 'Updated by admin' : 'Waiting for admin';
+            statusElements.weeklyEarnings.className = weeklyEarnings > 0 ? 'field-status updated' : 'field-status empty';
+
+            // Update history table
+            updateHistoryTable();
+
+            // Rebuild search data
+            buildSearchableData();
+            
+            // Check empty state
+            checkAndHideEmptyState();
+        }
+
+        // Update history table
+        function updateHistoryTable() {
+            const tableBody = document.getElementById('historyTable');
+            const monthlyHistory = userData.monthlyHistory || [];
+            
+            if (monthlyHistory.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                            No history available
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            
+            monthlyHistory.forEach(month => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="month-cell">${month.month}</td>
+                    <td>৳${(month.earnings || 0).toLocaleString()}</td>
+                    <td>${month.points || 0}</td>
+                    <td><span class="status-cell status-${month.status || 'pending'}">${(month.status || 'pending').charAt(0).toUpperCase() + (month.status || 'pending').slice(1)}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Check and hide empty state
+        function checkAndHideEmptyState() {
+            const hasData = userData.points > 0 || 
+                           userData.salary > 0 || 
+                           userData.monthlyEarnings > 0 || 
+                           userData.weeklyEarnings > 0 ||
+                           (userData.tasksCompleted || 0) > 0;
+            
+            emptyState.style.display = hasData ? 'none' : 'block';
+        }
+
+        // Update time badge
+        function updateTimeBadge() {
+            const now = new Date();
+            const date = now.getDate();
+            const month = now.toLocaleString('default', { month: 'short' });
+            const time = now.toLocaleTimeString('en-US', {
+                timeZone: 'Asia/Dhaka',
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            timeBadge.textContent = `${date} ${month} ${time}`;
+        }
+
+        // Build searchable data
+        function buildSearchableData() {
+            searchableData = [
+                { label: 'Total Points', value: userData.points || 0, category: 'points' },
+                { label: 'Monthly Earnings', value: `৳${(userData.monthlyEarnings || 0).toLocaleString()}`, category: 'earnings' },
+                { label: 'Current Salary', value: `৳${(userData.salary || 0).toLocaleString()}`, category: 'salary' },
+                { label: 'Tasks Completed', value: `${userData.tasksCompleted || 0}/${userData.totalTasks || 0}`, category: 'tasks' },
+                { label: 'Weekly Earnings', value: `৳${(userData.weeklyEarnings || 0).toLocaleString()}`, category: 'earnings' }
+            ];
+
+            // Add history data
+            (userData.monthlyHistory || []).forEach(month => {
+                searchableData.push({
+                    label: `History: ${month.month}`,
+                    value: `Earnings: ৳${(month.earnings || 0).toLocaleString()}, Points: ${month.points || 0}`,
+                    category: 'history'
+                });
+            });
+        }
+
+        // Search function
+        function performSearch(query) {
+            if (!query.trim()) {
+                searchResults.classList.remove('show');
+                return;
+            }
+
+            const searchTerm = query.toLowerCase();
+            const filteredResults = searchableData.filter(item => 
+                item.label.toLowerCase().includes(searchTerm) ||
+                item.value.toString().toLowerCase().includes(searchTerm) ||
+                item.category.toLowerCase().includes(searchTerm)
+            );
+
+            displaySearchResults(filteredResults);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            resultsContainer.innerHTML = '';
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">No results found</span>
+                        <span class="result-value">Try different keywords</span>
+                    </div>
+                `;
+            } else {
+                results.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <span class="result-label">${result.label}</span>
+                        <span class="result-value">${result.value}</span>
+                    `;
+                    resultItem.addEventListener('click', () => {
+                        searchInput.value = result.label;
+                        searchResults.classList.remove('show');
+                    });
+                    resultsContainer.appendChild(resultItem);
+                });
+            }
+            
+            searchResults.classList.add('show');
+        }
+
+        // Show performance graph
+        function showPerformanceGraph(type) {
+            alert(`Performance graph for ${type} would be shown here.\n\nThis feature requires additional charting libraries.\n\nCurrent ${type}: ${fieldElements[type].textContent}`);
+        }
+
+        // Open image upload modal
+        function openImageUpload() {
+            imageUploadModal.classList.add('show');
+            overlay.classList.add('show');
+        }
+
+        // Close image upload modal
+        function closeImageUpload() {
+            imageUploadModal.classList.remove('show');
+            overlay.classList.remove('show');
+            previewContainer.style.display = 'none';
+            profileImageFile = null;
+            fileInput.value = '';
+        }
+
+        // Use default image
+        function useDefaultImage() {
+            const user = window.sharedDB.getUserById(currentUser.id);
+            const initials = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+            const defaultImage = `https://via.placeholder.com/90/667eea/ffffff?text=${initials}`;
+            
+            profileImage.src = defaultImage;
+            userData.profileImage = defaultImage;
+            window.sharedDB.saveUserData(currentUser.id, { profileImage: defaultImage });
+            
+            window.sharedDB.addNotification(currentUser.id, {
+                title: "Profile Updated",
+                description: "Profile picture set to default avatar",
+                type: 'update'
+            });
+            
+            notifications = window.sharedDB.getUserNotifications(currentUser.id);
+            updateNotifications();
+            
+            closeImageUpload();
+        }
+
+        // Save profile image
+        function saveProfileImage() {
+            if (profileImageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImage.src = e.target.result;
+                    userData.profileImage = e.target.result;
+                    window.sharedDB.saveUserData(currentUser.id, { profileImage: e.target.result });
+                    
+                    window.sharedDB.addNotification(currentUser.id, {
+                        title: "Profile Updated",
+                        description: "Profile picture saved successfully",
+                        type: 'update'
+                    });
+                    
+                    notifications = window.sharedDB.getUserNotifications(currentUser.id);
+                    updateNotifications();
+                    closeImageUpload();
+                };
+                reader.readAsDataURL(profileImageFile);
+            }
+        }
+
+        // Handle file input change
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('File size should be less than 5MB');
+                    return;
+                }
+                
+                profileImageFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Update notifications
+        function updateNotifications() {
+            notificationList.innerHTML = '';
+            
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>No notifications yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+                notificationItem.innerHTML = `
+                    <div class="notification-icon ${notification.type || 'update'}">
+                        <i class="fas fa-${getNotificationIcon(notification.type)}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-desc">${notification.description}</div>
+                        <div class="notification-meta">
+                            <span class="notification-time">${notification.time}</span>
+                            <span class="admin-time">Admin: ${notification.adminTime || 'System'}</span>
+                        </div>
+                    </div>
+                `;
+                notificationItem.addEventListener('click', () => markAsRead(notification.id));
+                notificationList.appendChild(notificationItem);
+            });
+            
+            // Update notification dot
+            const unreadCount = notifications.filter(n => !n.read).length;
+            notificationDot.style.display = unreadCount > 0 ? 'block' : 'none';
+        }
+
+        // Get notification icon
+        function getNotificationIcon(type) {
+            const icons = {
+                'update': 'sync-alt',
+                'points': 'coins',
+                'salary': 'money-bill-wave',
+                'default': 'bell'
+            };
+            return icons[type] || icons.default;
+        }
+
+        // Mark notification as read
+        function markAsRead(id) {
+            if (window.sharedDB.markNotificationAsRead(currentUser.id, id)) {
+                notifications = window.sharedDB.getUserNotifications(currentUser.id);
+                updateNotifications();
+            }
+        }
+
+        // Mark all as read
+        function markAllAsRead() {
+            if (window.sharedDB.markAllNotificationsAsRead(currentUser.id)) {
+                notifications = window.sharedDB.getUserNotifications(currentUser.id);
+                updateNotifications();
+            }
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', function() {
+            performSearch(this.value);
+        });
+
+        notificationTrigger.addEventListener('click', function() {
+            notificationPanel.classList.add('show');
+            overlay.classList.add('show');
+        });
+
+        overlay.addEventListener('click', function() {
+            notificationPanel.classList.remove('show');
+            overlay.classList.remove('show');
+            closeImageUpload();
+            hideLogoutConfirmation();
+        });
+
+        // Logout button click
+        logoutBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showLogoutConfirmation();
+        });
+
+        // Confirm logout
+        confirmLogoutBtn.addEventListener('click', function() {
+            hideLogoutConfirmation();
+            logout();
+        });
+
+        // Cancel logout
+        cancelLogoutBtn.addEventListener('click', function() {
+            hideLogoutConfirmation();
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!searchResults.contains(event.target) && !searchInput.contains(event.target)) {
+                searchResults.classList.remove('show');
+            }
+        });
+
+        // Keyboard shortcut for logout (Ctrl + L)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                showLogoutConfirmation();
+            }
+        });
+
+        // Initialize on load
+        window.onload = function() {
+            initPage();
+        };
+    </script>
+</body>
+</html>
